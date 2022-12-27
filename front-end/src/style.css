@@ -142,7 +142,9 @@ body {
 .clearButton:hover {
     background-color: rgb(245, 74, 74);
 }
-
+.updateMatchesButton{
+    margin-bottom: 20px;
+}
 
 
 
@@ -182,7 +184,7 @@ body {
     justify-content: space-between;
     box-shadow: inset 0 0 6px rgba(0, 0, 0, .3);
     background-color: white;
-
+    top:0;
 }
 
 .logo {
@@ -207,7 +209,7 @@ body {
 .headerLink {
     width: 150px;
     text-align: center;
-    padding-top: 30px;
+    padding: 30px 10px 0 10px;
     user-select: none;
     cursor: pointer;
     background-color: white;
@@ -226,4 +228,22 @@ body {
     width: 50%;
     height: 40%;
     
+}
+.PriceOptimizationWindow{
+    margin:auto;
+    margin-top:90px;
+    width:80%;
+    border:2px solid black;
+}
+.matchRow{
+    display: flex;
+    border-bottom: 1px solid black;
+}
+.match{
+    padding:20px 0;
+    margin: 0 20px;
+    width:25%;
+}
+.priceInput{
+    width:100%;
 }

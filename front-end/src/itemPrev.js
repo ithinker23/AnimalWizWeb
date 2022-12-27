@@ -1,6 +1,6 @@
-import ItemGridForm from './ItemGridForm'
+import PidForm from './PidForm'
 
-export default function itemPrev({ item, updateMatchesDB, setSelectedItems, initData, setHeader, headerTable, data, setData, sellers, selectedItemsInitData }) {
+export default function itemPrev({ item, updateMatchesDB, setSelectedItems, initData, setPrevData, prevDB, data, setData, sellers, selectedItemsInitData }) {
 
 
     function getImages() {
@@ -25,11 +25,11 @@ export default function itemPrev({ item, updateMatchesDB, setSelectedItems, init
                     }
                 </div>
                 <div className="itemContent">
-                    <div className="itemTitle">{item.title} <span className="itemPrice">${item.cost_per_item}</span></div>
+                <PidForm  selectedItemsInitData={selectedItemsInitData} updateMatchesDB={updateMatchesDB} setSelectedItems={setSelectedItems} initData={initData} setPrevData={setPrevData} prevDB={prevDB} data={data} setData={setData} sellers={sellers} />
+                    <div className="itemTitle">{item.title} <span className="itemPrice">${item.variant_price}</span></div>
 
                     <div className="itemDesc">{item.tags}</div>
                 </div>
-                <ItemGridForm  selectedItemsInitData={selectedItemsInitData} updateMatchesDB={updateMatchesDB} setSelectedItems={setSelectedItems} initData={initData} setHeader={setHeader} headerTable={headerTable} data={data} setData={setData} sellers={sellers} />
             </div>
         </div>
     </>)

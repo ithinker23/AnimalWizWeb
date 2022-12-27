@@ -5,6 +5,7 @@ export default function Header() {
 
         <div className='headerLinkGroup'>
             <div className='headerLink' onClick={()=>{window.location.href = "/findItems"}}>Item Selection</div>
+            <div className='headerLink' onClick={()=>{window.location.href = "/priceOptimization"}}>Price Optimization</div>
         </div>
     </div>)
 }

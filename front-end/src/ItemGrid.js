@@ -1,23 +1,20 @@
 import Item from './Item'
 import { useState } from 'react'
-import ItemPrev from './itemPrev'
+import ItemPrev from './ItemPrev'
 import axios from 'axios'
 import ClearSelection from './ClearSelection'
 import uuid from 'react-uuid';
 
-export default function ItemGrid() {
-    const sellers = ["amazon","chewy"]
-    const headerTable = "a_wiz"
-    const matchesDB = "aw_matches"
+export default function ItemGrid({sellers, prevDB, matchesDB}) {
 
     var initData
     sellers.forEach((seller) => {
         initData = {...initData, [seller]:{data:[], seller:""}}
     })
     const [data, setData] = useState(initData)
-    const [headerData, setHeader] = useState({pid:null, images:[], title:"", description:"", price:""})
+    const [prevData, setPrevData] = useState({pid:null, images:[], title:"", description:"", price:""})
 
-    var selectedItemsInitData = {pid: headerData.pid}
+    var selectedItemsInitData = {pid: prevData.pid}
      sellers.forEach((seller)=>{
         selectedItemsInitData = {...selectedItemsInitData, [seller]:null}
      })
@@ -35,13 +32,13 @@ export default function ItemGrid() {
     async function updateMatchesDB(){
         console.log("UPDATING MATCHES")
         console.log(selectedItems)
-       await axios.post('http://localhost:5000/items/updateMatches', {ids: selectedItems, matchesDB:matchesDB})
+       await axios.post('http://localhost:5000/items/updateMatches', {ids: selectedItems, matchesDB:matchesDB, sellers:sellers, prevDB:prevDB})
        setSelectedItems(selectedItemsInitData)
     }
 
     return (
         <div className='flexContent'>  
-            <ItemPrev item={headerData} updateMatchesDB={updateMatchesDB} setSelectedItems={setSelectedItems}  selectedItemsInitData={selectedItemsInitData} initData={initData} setHeader={setHeader} headerTable={headerTable} data={data} setData={setData} sellers={sellers}/>
+            <ItemPrev item={prevData} updateMatchesDB={updateMatchesDB} setSelectedItems={setSelectedItems}  selectedItemsInitData={selectedItemsInitData} initData={initData} setPrevData={setPrevData} prevDB={prevDB} data={data} setData={setData} sellers={sellers}/>
             <div className='itemGrid'>
                 {
                     sellers.map(seller => {

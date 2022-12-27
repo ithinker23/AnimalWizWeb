@@ -1,8 +1,8 @@
+const { query } = require('express');
 const client = require('./dbConnection');
 
 function getItems(table, pid) {
     var query = "SELECT * FROM " + table + " WHERE pid = " + pid
-    console.log("SENDING DATA, query: " + query)
     return new Promise((resolve, reject) => {
         client.query(query, (err, res) => {
             if (err) reject(err)
@@ -11,32 +11,66 @@ function getItems(table, pid) {
     })
 }
 
-function updateMatches(ids, matchesDB) {
-    var query = "SELECT * FROM " + matchesDB + " WHERE aw_pid=" + ids.pid
+function updateMatches(ids, matchesDB, sellers, prevDB) {
+
+    var query = "SELECT * FROM " + matchesDB + " WHERE " + prevDB + "=" + ids.pid
     return new Promise((resolve, reject) => {
-    client.query(query, (err, res) => {
-        if (err) throw(err)
-        if (res.rows.length == 0) {
-            query = "INSERT INTO " + matchesDB + " (aw_pid, az_id ,ch_id) values (" + ids.pid + ", " + ids.amazon + ", " + ids.chewy + ")"
-            client.query(query, (err, res) => {
-                if (err) throw(err)
-                resolve()
-            })
-        } else {
-            query = "UPDATE " + matchesDB + " SET az_id=" + ids.amazon + ", ch_id=" + ids.chewy + " WHERE aw_pid=" + ids.pid + ""
-            client.query(query, (err, res) => {
-                if (err) throw(err)
-                resolve()
-            })
-        }
+        client.query(query, (err, res) => {
+            if (err) throw (err)
+            if (res.rows.length == 0) {
+                query = "INSERT INTO " + matchesDB + '('+prevDB+','
+                let i = 0
+                sellers.forEach((seller) => {
+
+                    query += seller
+                    if (sellers.length - 1 != i) {
+                        query += ','
+                    }
+                    i++
+                })
+                query += ") values (" + ids.pid + ','
+                
+                i = 0
+                sellers.forEach((seller) => {
+                    query += ids[seller]
+                    if(sellers.length -1 != i)
+                    query += ','
+                    i++
+                })
+
+                query += ')'
+
+                client.query(query, (err, res) => {
+                    if (err) throw (err)
+                    resolve()
+                })
+            } else {
+                query = "UPDATE " + matchesDB + " SET "
+                let i = 0
+                sellers.forEach(seller=>{
+            
+                    query += seller + "=" + ids[seller]
+
+                    if(sellers.length -1 != i){
+                        query+= ','
+                    }
+                    i++
+                })
+                query += " WHERE " + prevDB + " = " + ids.pid 
+
+                client.query(query, (err, res) => {
+                    if (err) throw (err)
+                    resolve()
+                })
+            }
+        })
     })
-})
 }
 
-function getPidList(table){
+function getPidList(table) {
     var query = "SELECT pid FROM " + table + " WHERE title != ''"
     return new Promise((resolve, reject) => {
-        client.query(query, (err,res) =>{
+        client.query(query, (err, res) => {
             if (err) reject(err)
             resolve(res)
 
@@ -44,4 +78,58 @@ function getPidList(table){
     })
 }
 
-module.exports = { getItems, updateMatches, getPidList }
+async function getMatches(matchesDB, sellers, pricesDB, prevDB) {
+
+    let query = "SELECT * FROM " + matchesDB
+
+    let res = await client.query(query)
+
+    let matchesList = []
+
+    for (let i = 0; i < res.rows.length; i++) {
+
+        let match = {}
+
+        for (let seller = 0; seller < sellers.length; seller++) {
+            if (res.rows[i][sellers[seller]] === null) {
+                match[sellers[seller]] = { price: "Unlisted", seller: sellers[seller] }
+            } else {
+
+                query = "SELECT * FROM " + sellers[seller] + " WHERE id = " + res.rows[i][sellers[seller]]
+
+                let sellerRes = await client.query(query)
+                match[sellers[seller]] = { price: sellerRes.rows[0].price ? "$" + sellerRes.rows[0].price : "Need to check website", seller: sellers[seller] }
+            }
+        }
+
+        query = "SELECT * FROM " + prevDB + " WHERE pid = " + res.rows[i][prevDB]
+
+        let matchRes = await client.query(query)
+
+        query = "SELECT updated_price FROM " + pricesDB + " WHERE pid = " + res.rows[i][prevDB]
+
+        let priceRes = await client.query(query)
+
+        match[prevDB] = { pid: matchRes.rows[0].pid, title: matchRes.rows[0].title, variantPrice: "$" + matchRes.rows[0].variant_price, costPerItem: "$" + matchRes.rows[0].cost_per_item, seller: prevDB, updatedPrice: priceRes.rows[0] ? priceRes.rows[0].updated_price : "Not Updated Yet" }
+
+        matchesList.push(match)
+    }
+
+    return (matchesList)
+}
+
+async function updatePrices(pid, price, pricesDB) {
+    let query = "SELECT pid FROM " + pricesDB + " WHERE pid = " + pid
+    client.query(query, (err, res) => {
+        if (err) throw err
+        if (res.rows.length == 0) {
+            query = "INSERT INTO " + pricesDB + " (pid, updated_price) VALUES ('" + pid + "', '" + price + "')"
+            client.query(query)
+        } else {
+            query = "UPDATE " + pricesDB + " SET updated_price = " + price + " WHERE pid = " + pid
+            client.query(query)
+        }
+    })
+}
+
+module.exports = { getItems, updateMatches, getPidList, getMatches, updatePrices }

@@ -13,4 +13,10 @@ router.route('/updateMatches')
 router.route('/getPidList')
 .post(controller.getPidList)
 
+router.route('/getMatches')
+.post(controller.getMatches)
+
+router.route('/updatePrices')
+.post(controller.updatePrices)
+
 module.exports = router; 
