@@ -6,7 +6,7 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Header from './Header'
 import PriceOptimization from './PriceOptimization'
 
-const sellers = ["amazon","chewy"]
+const sellers = ["chewy"]
 const prevDB = "animal_wiz"
 const matchesDB = "aw_matches"
 const pricesDB = "aw_changed_prices"

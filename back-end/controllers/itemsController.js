@@ -2,7 +2,7 @@ var itemsQuerys = require('../models/itemsQuerys')
 
 module.exports = {
     getItems: async (req, res) => {
-        let items = await itemsQuerys.getItems(req.body.table, req.body.pid)
+        let items = await itemsQuerys.getItems(req.body.table, req.body.pid, req.body.sortBy)
         res.send(items)
     },
 

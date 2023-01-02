@@ -34,7 +34,7 @@ export default function Item({ seller, handleSelectedItems, item, selectedItems 
                     }
                 </div>
                 <div className="itemContent">
-                    <div className="itemTitle">{item.title} <span className="itemPrice">${item.price}</span></div>
+                    <div className="itemTitle">{item.title} <span className="itemPrice">{item.price}</span></div>
                  
                     <div className="itemDesc">{item.description}</div>
                     <div className="button" onClick={selectItem}>THIS IS THE ITEM</div>

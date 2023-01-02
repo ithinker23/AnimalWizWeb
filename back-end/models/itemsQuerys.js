@@ -1,8 +1,13 @@
 const { query } = require('express');
 const client = require('./dbConnection');
 
-function getItems(table, pid) {
+function getItems(table, pid, sortBy) {
     var query = "SELECT * FROM " + table + " WHERE pid = " + pid
+
+    if (sortBy != null){
+        query += " ORDER BY " + sortBy
+    }
+
     return new Promise((resolve, reject) => {
         client.query(query, (err, res) => {
             if (err) reject(err)
@@ -69,6 +74,7 @@ function updateMatches(ids, matchesDB, sellers, prevDB) {
 
 function getPidList(table) {
     var query = "SELECT pid FROM " + table + " WHERE title != ''"
+
     return new Promise((resolve, reject) => {
         client.query(query, (err, res) => {
             if (err) reject(err)
@@ -98,7 +104,7 @@ async function getMatches(matchesDB, sellers, pricesDB, prevDB) {
                 query = "SELECT * FROM " + sellers[seller] + " WHERE id = " + res.rows[i][sellers[seller]]
 
                 let sellerRes = await client.query(query)
-                match[sellers[seller]] = { price: sellerRes.rows[0].price ? "$" + sellerRes.rows[0].price : "Need to check website", seller: sellers[seller] }
+                match[sellers[seller]] = { price: sellerRes.rows[0].price ? sellerRes.rows[0].price : "Need to check website", seller: sellers[seller] }
             }
         }
 
@@ -110,7 +116,7 @@ async function getMatches(matchesDB, sellers, pricesDB, prevDB) {
 
         let priceRes = await client.query(query)
 
-        match[prevDB] = { pid: matchRes.rows[0].pid, title: matchRes.rows[0].title, variantPrice: "$" + matchRes.rows[0].variant_price, costPerItem: "$" + matchRes.rows[0].cost_per_item, seller: prevDB, updatedPrice: priceRes.rows[0] ? priceRes.rows[0].updated_price : "Not Updated Yet" }
+        match[prevDB] = { pid: matchRes.rows[0].pid, title: matchRes.rows[0].title, variantPrice: matchRes.rows[0].variant_price, costPerItem: matchRes.rows[0].cost_per_item, seller: prevDB, updatedPrice: priceRes.rows[0] ? priceRes.rows[0].updated_price : "Not Updated Yet" }
 
         matchesList.push(match)
     }

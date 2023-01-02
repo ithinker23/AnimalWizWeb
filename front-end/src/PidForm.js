@@ -33,7 +33,7 @@ export default function PidForm({  selectedItemsInitData, updateMatchesDB, setSe
     console.log("UPDATING ITEMS")
     let init = initData
     sellers.forEach(async (seller) => {
-      let res = await axios.post("http://localhost:5000/items/getItems", { table: seller, pid: pid })
+      let res = await axios.post("http://localhost:5000/items/getItems", { table: seller, pid: pid, sortBy: "similarity" })
       init[seller] = { data: res.data.rows, seller: seller }
       setData(init)
       setSelectedItems(selectedItemsInitData)
