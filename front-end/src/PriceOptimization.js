@@ -23,8 +23,8 @@ export default function PriceOptimization({ sellers, matchesDB, prevDB, pricesDB
 
     return (<>
         <div className="PriceOptimizationWindow">
-            {matches.map(match => {
-                return <MatchRow match={match} sellers={sellers} prevDB={prevDB} pricesDB={pricesDB} />
+            {matches.map((match,index) => {
+                return <MatchRow match={match} sellers={sellers} prevDB={prevDB} pricesDB={pricesDB} index={index}/>
             })}
         </div>
     </>)

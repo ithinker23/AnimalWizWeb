@@ -3,7 +3,7 @@ import ItemPricePrev from './ItemPricePrev'
 import Match from './Match'
 import { useState } from "react"
 
-export default function MatchRow({match, sellers, prevDB, pricesDB}){
+export default function MatchRow({match, sellers, prevDB, pricesDB,index}){
 
     const [shopifyPrice, setShopifyPrice] = useState()
 
@@ -14,6 +14,7 @@ export default function MatchRow({match, sellers, prevDB, pricesDB}){
 
     return (<>
     <div className="matchRow">
+        {index + 1}
         <ItemPricePrev updatePrices={updatePrices} setShopifyPrice={setShopifyPrice} prevItem={match[prevDB]}/>
         {sellers.map((seller)=>{
             return <Match item={match[seller]}/>

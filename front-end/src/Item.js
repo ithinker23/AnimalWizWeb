@@ -16,7 +16,9 @@ export default function Item({ seller, handleSelectedItems, item, selectedItems 
         handleSelectedItems(seller, item.id)
     }
 
-    
+    function goToProduct(){
+        window.location.href = item.p_url
+    }
     useEffect(()=>{
         if(item.id === selectedItems[seller]){
             itemRef.current.style = "background-color:#ADD8E6";
@@ -38,6 +40,7 @@ export default function Item({ seller, handleSelectedItems, item, selectedItems 
                  
                     <div className="itemDesc">{item.description}</div>
                     <div className="button" onClick={selectItem}>THIS IS THE ITEM</div>
+                    <div className="button" onClick={goToProduct}>GO TO URL</div>
                 </div>
             </div>
         </>

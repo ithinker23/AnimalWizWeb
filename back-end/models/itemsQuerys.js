@@ -116,7 +116,7 @@ async function getMatches(matchesDB, sellers, pricesDB, prevDB) {
 
         let priceRes = await client.query(query)
 
-        match[prevDB] = { pid: matchRes.rows[0].pid, title: matchRes.rows[0].title, variantPrice: matchRes.rows[0].variant_price, costPerItem: matchRes.rows[0].cost_per_item, seller: prevDB, updatedPrice: priceRes.rows[0] ? priceRes.rows[0].updated_price : "Not Updated Yet" }
+        match[prevDB] = { image_src:matchRes.rows[0].image_src, pid: matchRes.rows[0].pid, title: matchRes.rows[0].title, variantPrice: matchRes.rows[0].variant_price, costPerItem: matchRes.rows[0].cost_per_item, seller: prevDB, updatedPrice: priceRes.rows[0] ? priceRes.rows[0].updated_price : "Not Updated Yet" }
 
         matchesList.push(match)
     }
