@@ -247,3 +247,8 @@ body {
 .priceInput{
     width:100%;
 }
+.storeSearchLink{
+    display:block;
+    margin:auto;
+    width:fit-content;
+}

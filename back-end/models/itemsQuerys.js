@@ -1,4 +1,3 @@
-const { query } = require('express');
 const client = require('./dbConnection');
 
 function getItems(table, pid, sortBy) {

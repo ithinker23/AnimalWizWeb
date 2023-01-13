@@ -8,7 +8,6 @@ export default function PidForm({  selectedItemsInitData, updateMatchesDB, setSe
 
   useEffect(() => {
     getItems()
-    // eslint-disable-next-line 
   }, [pid])
 
   useEffect(() => {
