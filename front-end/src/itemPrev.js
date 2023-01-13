@@ -1,7 +1,24 @@
-import PidForm from './PidForm'
+import axios from 'axios';
+import { useEffect, useState } from 'react';
+import PidForm from './PidForm';
 
-export default function itemPrev({ item, updateMatchesDB, setSelectedItems, initData, setPrevData, prevDB, data, setData, sellers, selectedItemsInitData }) {
+export default function ItemPrev({ item, updateMatchesDB, setSelectedItems, initData, setPrevData, prevDB, data, setData, sellers, selectedItemsInitData }) {
+    
+    const [urls,setUrls] = useState([])
 
+    useEffect(()=>{
+        setUrls([])
+        getUrls()
+    },[item])
+
+    function getUrls(){
+        return sellers.forEach(async (seller) => {
+           let res = await axios.post('http://localhost:5000/urls/getSearchUrl', {storeName:seller, searchQuery:item.title})
+            setUrls((urls)=>{
+                return [...urls, {seller:seller, url:res.data}]
+            })
+        });
+    }
 
     function getImages() {
         if (item.image_src != null) {
@@ -29,6 +46,11 @@ export default function itemPrev({ item, updateMatchesDB, setSelectedItems, init
                     <div className="itemTitle">{item.title} <span className="itemPrice">${item.variant_price}</span></div>
 
                     <div className="itemDesc">{item.tags}</div>
+                    {
+                        urls.map(url =>{
+                            return <a class="storeSearchLink" href={url.url} target="_blank">{url.seller} search query</a>
+                        })
+                    }
                 </div>
             </div>
         </div>

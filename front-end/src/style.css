@@ -252,3 +252,8 @@ body {
     width:75px;
     margin-top:10px;
 }
+.storeSearchLink{
+    display:block;
+    margin:auto;
+    width:fit-content;
+}
