@@ -1,6 +1,6 @@
 export default function Header() {
     return (<div className="header">
-        <div className='logo'>
+        <div className='logo headerLink' onClick={()=>{window.location.href = "/"}}>
             <img src="a_wizlogo.webp" alt='img' /></div>
 
         <div className='headerLinkGroup'>

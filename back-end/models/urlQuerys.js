@@ -6,7 +6,7 @@ function getSearchUrl(storeName, searchQuery){
     return new Promise((resolve, reject) => {
         client.query(query, (err, res) => {
             if (err) reject(err)
-            resolve(res.rows[0].base_url + res.rows[0].search_query + searchQuery)
+            resolve(res.rows[0].base_url + res.rows[0].search_query + searchQuery.replaceAll(/[\W_]+/g," "))
         })
     })
 }

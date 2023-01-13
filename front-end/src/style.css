@@ -187,19 +187,6 @@ body {
     top:0;
 }
 
-.logo {
-    height: 100%;
-    width: 140px;
-    margin-left: 10px;
-    padding-top: 5px;
-}
-
-.logo>img {
-    height: 90%;
-    width: 90%;
-    text-align: center;
-}
-
 .headerLinkGroup {
     display: flex;
     flex-direction: row;
@@ -256,4 +243,17 @@ body {
     display:block;
     margin:auto;
     width:fit-content;
+}
+
+.logo {
+    height: 90%;
+    width: 140px;
+    margin-left: 10px;
+    padding-top: 5px;
+}
+
+.logo>img {
+    height: 90%;
+    width: 90%;
+    text-align: center;
 }
