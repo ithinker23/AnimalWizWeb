@@ -1,9 +1,8 @@
-import Item from './Item'
 import { useState } from 'react'
 import ItemPrev from './ItemPrev'
 import axios from 'axios'
-import ClearSelection from './ClearSelection'
-import uuid from 'react-uuid';
+import ItemGridFilter from './ItemGridFilter'
+import SellerCol from './SellerCol'
 
 export default function ItemGrid({sellers, prevDB, matchesDB}) {
 
@@ -36,31 +35,21 @@ export default function ItemGrid({sellers, prevDB, matchesDB}) {
        setSelectedItems(selectedItemsInitData)
     }
 
-    return (
-        <div className='flexContent'>  
+    return (<>
+        <ItemGridFilter/>
+        <div className="button clearButton" onClick={()=>{setSelectedItems(selectedItemsInitData)}}>Clear Selections</div>
+        <div className='flexContent'> 
             <ItemPrev item={prevData} updateMatchesDB={updateMatchesDB} setSelectedItems={setSelectedItems}  selectedItemsInitData={selectedItemsInitData} initData={initData} setPrevData={setPrevData} prevDB={prevDB} data={data} setData={setData} sellers={sellers}/>
             <div className='itemGrid'>
                 {
                     sellers.map(seller => {
                         return (
-                        <div  key={uuid()} className='sellerCol'>
-                            <ClearSelection seller={seller} setSelectedItems={setSelectedItems}/>
-                            <div className='itemsCol'>
-                            <div className='sellerTitle'>{seller} items</div>
-                            <div className='sellerItems'>     
-                            {
-                            data[seller].data.map((item) => {
-                                 return (<>
-                                     <Item key={uuid} selectedItems={selectedItems} item={item} seller={data[seller].seller} handleSelectedItems={handleSelectedItems}/>
-                                 </>)
-                             })
-                            }
-                            </div>
-                        </div>
-                        </div>)
+                            <SellerCol seller={seller} data={data} selectedItems={selectedItems} handleSelectedItems={handleSelectedItems} pid={prevData.pid}/>
+                        )
                     })
                 }
             </div>
-        </div>
+        </div></>
+
     )
 }

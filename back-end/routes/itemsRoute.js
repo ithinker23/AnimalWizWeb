@@ -19,4 +19,7 @@ router.route('/getMatches')
 router.route('/updatePrices')
 .post(controller.updatePrices)
 
+router.route('/checkMappingState')
+.post(controller.checkMappingState)
+
 module.exports = router; 

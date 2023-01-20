@@ -5,6 +5,8 @@ const bodyParser = require('body-parser')
 const cors = require('cors');
 const {Server} = require('socket.io')
 const http = require('http')
+let homeQuerys = require('./models/homeQuerys')
+let client = require('./models/dbConnection')
 
 app.use(cors({origin: 'http://localhost:3000', credentials: true}));
 
@@ -24,15 +26,6 @@ server.listen(5001,() => {
   console.log("SOCKETIO RUNNING ON "+ 5001)
 })
 
-
-io.on("connection", (socket)=>{
-    console.log("USER CONNECTED: " + socket.id)
-
-    socket.on("start_scrapers", (data)=>{
-        console.log(data)
-    })
-})
-
 const itemsRoute = require('./routes/itemsRoute.js');
 app.use('/items', itemsRoute);
 
@@ -42,6 +35,34 @@ app.use('/', _404Route)
 const urlsRoute = require('./routes/urlsRoute');
 app.use('/urls', urlsRoute)
 
+const scraperRoute = require('./routes/scraperRoute');
+app.use('/scrapers', scraperRoute)
+
 app.listen(port, () => {
   console.log(`listening on port ${port}`)
+})
+
+io.on("connection", (socket)=>{
+  console.log("USER CONNECTED: " + socket.id)
+    
+    socket.on('startPostingData', async (sellers)=>{
+
+      let graphData = await homeQuerys.getGraphData(sellers)
+      socket.emit("postGraphData", graphData)
+
+      let itemData = await homeQuerys.getItemData(sellers)
+      socket.emit("postItemData", itemData)
+
+      client.on('notification', async function(msg) {
+        graphData = await homeQuerys.getGraphData(sellers)
+        socket.emit("postGraphData", graphData)
+
+        itemData = await homeQuerys.getItemData(sellers)
+        socket.emit("postItemData", itemData)
+      })
+    })
+
+  socket.on('disconnect', function () {
+    console.log('A user disconnected');
+  });
 })

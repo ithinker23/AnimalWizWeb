@@ -7,17 +7,12 @@ export default function ItemPrev({ item, updateMatchesDB, setSelectedItems, init
     const [urls,setUrls] = useState([])
 
     useEffect(()=>{
-        setUrls([])
         getUrls()
     },[item])
 
-    function getUrls(){
-        return sellers.forEach(async (seller) => {
-           let res = await axios.post('http://localhost:5000/urls/getSearchUrl', {storeName:seller, searchQuery:item.title})
-            setUrls((urls)=>{
-                return [...urls, {seller:seller, url:res.data}]
-            })
-        });
+    async function getUrls(){
+        let res = await axios.post('http://localhost:5000/urls/getSearchUrl', {stores:sellers, searchQuery:item.title})
+        setUrls(res.data)
     }
 
     function getImages() {
@@ -47,8 +42,8 @@ export default function ItemPrev({ item, updateMatchesDB, setSelectedItems, init
 
                     <div className="itemDesc">{item.tags}</div>
                     {
-                        urls.map(url =>{
-                            return <a class="storeSearchLink" href={url.url} target="_blank">{url.seller} search query</a>
+                        sellers.map(seller =>{
+                            return <a className="storeSearchLink" href={urls[seller]} target="_blank">{seller} search query</a>
                         })
                     }
                 </div>

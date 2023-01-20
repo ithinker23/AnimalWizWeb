@@ -52,9 +52,9 @@ export default function PidForm({  selectedItemsInitData, updateMatchesDB, setSe
   }
 
   return (<>
-    <div className='pidNav'>
+    <div className='nav'>
       <div className="navButton button" onClick={() => { setPid(pidList[pidList.indexOf(pid) - 1] ? pidList[pidList.indexOf(pid) - 1] : pidList[pidList.indexOf(pid)]) }}>Prev</div>
-      <div className='pidPrev'>{pid}</div>
+      <div className='navPrev'>{pid}</div>
       <div className='navButton button' onClick={() => { setPid(pidList[pidList.indexOf(pid) + 1] ? pidList[pidList.indexOf(pid) + 1] : pidList[pidList.indexOf(pid)]) }}>Next</div>
     </div>
     <div className='button updateMatchesButton' onClick={updateMatchesDB}>UPDATE MATCHES</div>

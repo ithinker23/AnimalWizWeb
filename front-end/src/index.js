@@ -17,7 +17,7 @@ root.render(
     <Header />
     <Router>
       <Routes>
-        <Route path='/' element={<Home />}/>
+        <Route path='/' element={<Home sellers={sellers}/>}/>
         <Route path="/findItems" element={<FindItems sellers={sellers} prevDB={prevDB} matchesDB={matchesDB}/>} />
         <Route path="/priceOptimization" element={<PriceOptimization sellers={sellers} prevDB={prevDB} matchesDB={matchesDB} pricesDB={pricesDB}/>} />
       </Routes>

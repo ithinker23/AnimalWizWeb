@@ -1,3 +1,4 @@
+const { query } = require('express');
 const client = require('./dbConnection');
 
 function getItems(table, pid, sortBy) {
@@ -137,4 +138,25 @@ async function updatePrices(pid, price, pricesDB) {
     })
 }
 
-module.exports = { getItems, updateMatches, getPidList, getMatches, updatePrices }
+function checkMappingState(seller, pid){
+
+    return new Promise( async (resolve, reject) => {
+    let query = "SELECT  " + seller + " FROM aw_matches WHERE animal_wiz = " + pid
+
+    try{
+        let res = await client.query(query)
+        if(res.rows.length > 0){
+            if(res.rows[0][seller] == null){
+                resolve("Not Mapped")
+            }else{
+                resolve("Mapped")
+            }
+        }else{
+            resolve("Not Mapped")
+        }
+    } catch(err){
+        reject(err)
+    }
+})
+}
+module.exports = { getItems, updateMatches, getPidList, getMatches, updatePrices, checkMappingState }

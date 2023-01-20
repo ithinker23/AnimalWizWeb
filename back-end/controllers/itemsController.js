@@ -41,6 +41,17 @@ module.exports = {
             console.log(err)
             res.sendStatus(400)
         }
+    },
+
+    checkMappingState: async (req,res)=>{
+        try {
+            let result = await itemsQuerys.checkMappingState(req.body.seller, req.body.pid)
+            res.send(result)
+        } catch (err) {
+            console.log(err)
+            res.sendStatus(400)
+        }
+
     }
 
 }

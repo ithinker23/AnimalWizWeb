@@ -17,7 +17,7 @@ export default function Item({ seller, handleSelectedItems, item, selectedItems 
     }
 
     function goToProduct(){
-        window.location.href = item.p_url
+        window.open(item.p_url, '_blank');
     }
     useEffect(()=>{
         if(item.id === selectedItems[seller]){
