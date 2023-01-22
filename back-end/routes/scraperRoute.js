@@ -4,7 +4,7 @@ const router = express.Router();
 const controller = require('../controllers/scraperController');
 
 // route the request to UrlController
-router.route('/startScraper')
-.post(controller.startScraper);
+router.route('/scrape')
+.post(controller.scrape);
 
 module.exports = router

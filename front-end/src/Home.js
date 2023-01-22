@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import io from 'socket.io-client'
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -12,9 +11,7 @@ import {
 import { Bar } from 'react-chartjs-2';
 import NotScrapedItemsList from './NotScrapedItemsList'
 
-const socket = io.connect('http://localhost:5001')
-
-export default function Home({ sellers }) {
+export default function Home({ sellers, socket }) {
   let initItemData = {}
   sellers.forEach(seller => {
     initItemData[seller + " nullPids"] = []
