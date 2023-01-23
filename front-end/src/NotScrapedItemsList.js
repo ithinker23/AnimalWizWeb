@@ -6,7 +6,7 @@ export default function NotScrapedItemsList({ seller, items,startScraperHome }) 
     const [page, setPage] = useState(1)
 
     return (<div className='homeNotScrapedItemColumn'>
-        <div className='homeNotScrapedItemTitle'>{seller} Items Not Scraped</div>
+        <div className='homeNotScrapedItemTitle'>un-scraped {seller} items</div>
         <div className='homeNotScrapedItemsList'>
             {
                 items.map((item, index) => {
