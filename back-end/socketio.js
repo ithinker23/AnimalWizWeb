@@ -103,6 +103,10 @@ io.on("connection", (socket)=>{
       })
     })
     
+    socket.on('mapItem', (data)=>{
+      itemQuerys.updateMatches(data['pid'], data['id'], data['seller'])
+    })
+
     socket.on('disconnect', function () {
       console.log('A user disconnected');
     });

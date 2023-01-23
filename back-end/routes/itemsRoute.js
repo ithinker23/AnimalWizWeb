@@ -16,9 +16,6 @@ router.route('/getPidList')
 router.route('/getMatches')
 .post(controller.getMatches)
 
-router.route('/updatePrices')
-.post(controller.updatePrices)
-
 router.route('/checkMappingState')
 .post(controller.checkMappingState)
 

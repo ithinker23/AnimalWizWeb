@@ -4,7 +4,7 @@ import axios from 'axios'
 import ItemGridFilter from './ItemGridFilter'
 import SellerCol from './SellerCol'
 
-export default function ItemGrid({sellers, prevDB, matchesDB, socket}) {
+export default function ItemGrid({sellers, storeDB, socket}) {
 
     var initData
     sellers.forEach((seller) => {
@@ -13,26 +13,7 @@ export default function ItemGrid({sellers, prevDB, matchesDB, socket}) {
     const [data, setData] = useState(initData)
     const [prevData, setPrevData] = useState({pid:null, images:[], title:"", description:"", price:""})
     const [scraperStatus, setScraperStatus] = useState(false)
-    var selectedItemsInitData = {pid: prevData.pid}
-     sellers.forEach((seller)=>{
-        selectedItemsInitData = {...selectedItemsInitData, [seller]:null}
-     })
-     
-    const [selectedItems, setSelectedItems] = useState(selectedItemsInitData)
-
-    function handleSelectedItems(seller, id){
-        setSelectedItems((prev)=>{
-            let obj = {...prev}
-            obj[seller] = id
-            return obj
-        })
-   }
-
-    async function updateMatchesDB(){
-       await axios.post('http://localhost:5000/items/updateMatches', {ids: selectedItems, matchesDB:matchesDB, sellers:sellers, prevDB:prevDB})
-       setSelectedItems(selectedItemsInitData)
-    }
-
+   
     useEffect(() => {
         socket.on('scraperItems',(reqdata)=>{
             setScraperStatus(false)
@@ -42,18 +23,24 @@ export default function ItemGrid({sellers, prevDB, matchesDB, socket}) {
             })
         })
 
+        socket.on('mappedItems')
+
     }, [socket])
+
+    function selectItem(pid, id, seller){
+        socket.emit('mapItem', {pid:pid, id:id, seller:seller})
+    }
 
     return (<>
         <ItemGridFilter/>
-        <div className="button clearButton" onClick={()=>{setSelectedItems(selectedItemsInitData)}}>Clear Selections</div>
+        <div className="button clearButton">Clear Selections</div>
         <div className='flexContent'> 
-            <ItemPrev item={prevData} updateMatchesDB={updateMatchesDB} setSelectedItems={setSelectedItems}  selectedItemsInitData={selectedItemsInitData} initData={initData} setPrevData={setPrevData} prevDB={prevDB} data={data} setData={setData} sellers={sellers}/>
+            <ItemPrev item={prevData} initData={initData} setPrevData={setPrevData} storeDB={storeDB} data={data} setData={setData} sellers={sellers}/>
             <div className='itemGrid'>
                 {
                     sellers.map(seller => {
                         return (
-                            <SellerCol scraperStatus={scraperStatus} setScraperStatus={setScraperStatus} setData={setData} initData={initData} socket={socket} seller={seller} data={data} selectedItems={selectedItems} handleSelectedItems={handleSelectedItems} pid={prevData.pid}/>
+                            <SellerCol selectItem={selectItem} scraperStatus={scraperStatus} setScraperStatus={setScraperStatus} setData={setData} initData={initData} socket={socket} seller={seller} data={data} pid={prevData.pid}/>
                         )
                     })
                 }

@@ -1,4 +1,5 @@
 const client = require('./dbConnection');
+const config = require('config');
 
 module.exports = {
 
@@ -69,60 +70,11 @@ getNullItems: (seller) => {
     })
 },
 
-updateMatches: (ids, matchesDB, sellers, prevDB) =>  {
+updateMatches: (pid, id, seller) =>  {
+    query = "SELECT "
 
-    var query = "SELECT * FROM " + matchesDB + " WHERE " + prevDB + "=" + ids.pid
-    return new Promise((resolve, reject) => {
-        client.query(query, (err, res) => {
-            if (err) throw (err)
-            if (res.rows.length == 0) {
-                query = "INSERT INTO " + matchesDB + '(' + prevDB + ','
-                let i = 0
-                sellers.forEach((seller) => {
+    client.query(query)
 
-                    query += seller
-                    if (sellers.length - 1 != i) {
-                        query += ','
-                    }
-                    i++
-                })
-                query += ") values (" + ids.pid + ','
-
-                i = 0
-                sellers.forEach((seller) => {
-                    query += ids[seller]
-                    if (sellers.length - 1 != i)
-                        query += ','
-                    i++
-                })
-
-                query += ')'
-
-                client.query(query, (err, res) => {
-                    if (err) throw (err)
-                    resolve()
-                })
-            } else {
-                query = "UPDATE " + matchesDB + " SET "
-                let i = 0
-                sellers.forEach(seller => {
-
-                    query += seller + "=" + ids[seller]
-
-                    if (sellers.length - 1 != i) {
-                        query += ','
-                    }
-                    i++
-                })
-                query += " WHERE " + prevDB + " = " + ids.pid
-
-                client.query(query, (err, res) => {
-                    if (err) throw (err)
-                    resolve()
-                })
-            }
-        })
-    })
 },
 
 getPidList : (table) =>  {
@@ -137,9 +89,9 @@ getPidList : (table) =>  {
     })
 },
 
-getMatches: async (matchesDB, sellers, pricesDB, prevDB) =>  {
+getMatches: async (sellers, store_name) =>  {
 
-    let query = "SELECT * FROM " + matchesDB
+    let query = "SELECT * FROM " + config.get('tables.matchesDB')
 
     let res = await client.query(query)
 
@@ -149,23 +101,23 @@ getMatches: async (matchesDB, sellers, pricesDB, prevDB) =>  {
 
         let match = {}
 
-        for (let seller = 0; seller < sellers.length; seller++) {
-            if (res.rows[i][sellers[seller]] === null) {
-                match[sellers[seller]] = { price: "Unlisted", seller: sellers[seller] }
+        sellers.forEach(async (seller) =>{
+            if (res.rows[i][seller] === null) {
+                match[seller] = { price: "Unlisted", seller: seller }
             } else {
 
-                query = "SELECT * FROM " + sellers[seller] + " WHERE id = " + res.rows[i][sellers[seller]]
+                query = "SELECT * FROM " + seller + " WHERE id = " + res.rows[i][seller]
 
                 let sellerRes = await client.query(query)
-                match[sellers[seller]] = { price: sellerRes.rows[0].price ? sellerRes.rows[0].price : "Need to check website", seller: sellers[seller] }
+                match[seller] = { price: sellerRes.rows[0].price ? sellerRes.rows[0].price : "Need to check website", seller: seller }
             }
-        }
+        })
 
-        query = "SELECT * FROM " + prevDB + " WHERE pid = " + res.rows[i][prevDB]
+        query = "SELECT * FROM " + store_name + " WHERE pid = " + res.rows[i][store_name]
 
         let matchRes = await client.query(query)
 
-        match[prevDB] = { image_src: matchRes.rows[0].image_src, pid: matchRes.rows[0].pid, title: matchRes.rows[0].title, variantPrice: matchRes.rows[0].variant_price, costPerItem: matchRes.rows[0].cost_per_item, seller: prevDB}
+        match[store_name] = { image_src: matchRes.rows[0].image_src, pid: matchRes.rows[0].pid, title: matchRes.rows[0].title, variantPrice: matchRes.rows[0].variant_price, costPerItem: matchRes.rows[0].cost_per_item, seller: store_name}
 
         matchesList.push(match)
     }

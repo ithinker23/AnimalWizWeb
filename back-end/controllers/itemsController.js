@@ -8,7 +8,7 @@ module.exports = {
 
     updateMatches: async (req, res) => {
         try {
-            await itemsQuerys.updateMatches(req.body.ids, req.body.matchesDB, req.body.sellers, req.body.prevDB)
+            await itemsQuerys.updateMatches()
             res.sendStatus(200)
         } catch (err) {
             console.log(err)
@@ -26,17 +26,8 @@ module.exports = {
     },
     getMatches: async (req,res)=>{
         try {
-            let result = await itemsQuerys.getMatches(req.body.matchesDB, req.body.sellers, req.body.pricesDB, req.body.prevDB)
+            let result = await itemsQuerys.getMatches(req.body.sellers, req.body.store_name)
             res.status(200).json(result)
-        } catch (err) {
-            console.log(err)
-            res.sendStatus(400)
-        }
-    },
-    updatePrices: async (req,res)=>{
-        try {
-            await itemsQuerys.updatePrices(req.body.pid, req.body.price, req.body.pricesDB)
-            res.status(200)
         } catch (err) {
             console.log(err)
             res.sendStatus(400)

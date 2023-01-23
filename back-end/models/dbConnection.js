@@ -1,9 +1,11 @@
 const { Client } = require('pg')
+const config = require('config')
+
 const client = new Client({
-    host: '192.168.1.80',
-    user: 'postgres',
-    password: 'admin12345',
-    database: 'scrapyproducts'
+    host: config.get('database.host'),
+    user: config.get('database.user'),
+    password: config.get('database.password'),
+    database: config.get('database.db_name')
   })
 
 client.connect()

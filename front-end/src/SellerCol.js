@@ -2,7 +2,7 @@ import axios from 'axios'
 import React, { useEffect, useState, useRef } from 'react'
 import Item from './Item'
 
-export default function SellerCol({ seller, data, selectedItems, handleSelectedItems,pid, socket, scraperStatus, setScraperStatus}) {
+export default function SellerCol({ selectItem, seller, data, pid, socket, scraperStatus, setScraperStatus}) {
 
     const [mappedItem, setMappedItem] = useState()
     const urlTextRef = useRef()
@@ -37,7 +37,7 @@ export default function SellerCol({ seller, data, selectedItems, handleSelectedI
                     {
                         data[seller].data.map((item) => {
                             return (<>
-                                <Item mappedid={mappedItem} selectedItems={selectedItems} item={item} seller={data[seller].seller} handleSelectedItems={handleSelectedItems} />
+                                <Item selectItem={selectItem} mappedid={mappedItem} item={item} seller={data[seller].seller} />
                             </>)
                         })
                     }

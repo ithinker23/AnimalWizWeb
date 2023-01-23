@@ -2,10 +2,10 @@ import './style.css'
 
 import ItemGrid from './ItemGrid'
 
-function App({sellers,prevDB,matchesDB, socket}) {
+function App({sellers,storeDB, socket}) {
 
   return (
-      <ItemGrid sellers={sellers} prevDB={prevDB} matchesDB={matchesDB} socket={socket}/>
+      <ItemGrid sellers={sellers} storeDB={storeDB} socket={socket}/>
   );
 }
 

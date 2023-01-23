@@ -2,7 +2,7 @@ import axios from 'axios';
 import { useEffect, useState } from 'react';
 import PidForm from './PidForm';
 
-export default function ItemPrev({ item, updateMatchesDB, setSelectedItems, initData, setPrevData, prevDB, data, setData, sellers, selectedItemsInitData }) {
+export default function ItemPrev({ item, updateMatchesDB, setSelectedItems, initData, setPrevData, storeDB, data, setData, sellers, selectedItemsInitData }) {
     
     const [urls,setUrls] = useState([])
 
@@ -37,8 +37,8 @@ export default function ItemPrev({ item, updateMatchesDB, setSelectedItems, init
                     }
                 </div>
                 <div className="itemContent">
-                <PidForm  selectedItemsInitData={selectedItemsInitData} updateMatchesDB={updateMatchesDB} setSelectedItems={setSelectedItems} initData={initData} setPrevData={setPrevData} prevDB={prevDB} data={data} setData={setData} sellers={sellers} />
-                    <div className="itemTitle">{item.title} <span className="itemPrice">${item.variant_price}</span></div>
+                <PidForm  selectedItemsInitData={selectedItemsInitData} updateMatchesDB={updateMatchesDB} setSelectedItems={setSelectedItems} initData={initData} setPrevData={setPrevData} storeDB={storeDB} data={data} setData={setData} sellers={sellers} />
+                    <div className="itemTitle">{item.title}</div>
 
                     <div className="itemDesc">{item.tags}</div>
                     {

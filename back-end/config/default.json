@@ -7,6 +7,6 @@
   },
     "tables": {
       "matchesDB": "aw_matches",
-      "priceDB": ""
+      "urlsDB": "aw_scraper_urls"
   }
 }
