@@ -1,10 +1,8 @@
 const {Server} = require('socket.io')
 const http = require('http')
-const homeQuerys = require('./models/homeQuerys')
 const itemQuerys = require('./models/itemsQuerys')
 const client = require('./models/dbConnection')
 const app = require('./app')
-const axios = require('axios')
 
 const server = http.createServer(app)
 
@@ -19,6 +17,8 @@ server.listen(5001,() => {
   console.log("SOCKETIO RUNNING ON "+ 5001)
 })
 
+client.query('LISTEN channel')
+
 let KleinID
 
 io.on("connection", (socket)=>{
@@ -32,21 +32,75 @@ io.on("connection", (socket)=>{
     });
   })
 
+  
   socket.on('registeruser', ()=>{
 
     console.log("USER CONNECTED: " + socket.id)
 
-    socket.on('startScraperItemSelection',(scraperData) =>{
+      client.on('notification', async function(msg) {
+
+        let graphData = {}
+        let itemData = {}
+
+        seller = msg.payload
+
+        let scraped = await itemQuerys.getscrapedcount(seller)
+        graphData['foundPids'] = scraped
+  
+        let nonscraped= await itemQuerys.getnonscrapedcount(seller)
+        graphData['nullPids'] = nonscraped
+  
+        let mapped = await itemQuerys.getmappedcount(seller)
+        graphData['mappedPids'] = mapped
+  
+        let nullItems = await itemQuerys.getNullItems(seller)
+        itemData['nullItems']= nullItems
+
+        socket.emit('homeDataUpdate', {graphData:graphData, itemData:itemData, seller:seller})
+      })
+    
+    socket.on('getHomeData', async (sellers)=>{
+
+      let graphData = {}
+      let itemData = {}
+      sellers.forEach(async (seller, index) => {
+        itemData[seller] = {}
+        graphData[seller] = {}
+
+        let scraped = await itemQuerys.getscrapedcount(seller)
+        graphData[seller]['foundPids'] = scraped
+  
+        let nonscraped= await itemQuerys.getnonscrapedcount(seller)
+        graphData[seller]['nullPids'] = nonscraped
+  
+        let mapped = await itemQuerys.getmappedcount(seller)
+        graphData[seller]['mappedPids'] = mapped
+  
+        let nullItems = await itemQuerys.getNullItems(seller)
+        itemData[seller]["nullItems"] = nullItems
+  
+        if( index >= sellers.length - 1 ){
+          socket.emit('homeData', {graphData:graphData, itemData:itemData})
+        }
+  
+      });
+      
+    })
+
+    socket.on('startScraperHome', async (scraperData)=>{
+      socket.to(KleinID).emit('startScraper', scraperData)
+    })
+
+    socket.on('startScraperItems',async (scraperData) =>{
 
       socket.to(KleinID).emit('startScraper', scraperData)
 
       client.on('notification', async function(msg) {
+          
+        let res = await itemQuerys.getItems(scraperData.scraper, scraperData.pid, "similarity")
 
-        let selectionitemData = await itemQuerys.getItems(scraperData.scraper, scraperData.pid, "similarity")
-        socket.emit("setItems", {data:selectionitemData.rows, seller:scraperData.scraper})
+        socket.emit('scraperItems', {data:res.rows,seller:scraperData.scraper})
       })
-
-      client.query('LISTEN channel')
     })
     
     socket.on('disconnect', function () {

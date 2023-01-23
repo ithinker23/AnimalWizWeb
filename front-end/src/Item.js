@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import uuid from 'react-uuid';
 
-export default function Item({ seller, handleSelectedItems, item, selectedItems }) {
+export default function Item({ seller, handleSelectedItems, item, selectedItems, mappedid }) {
 
     const itemRef = useRef()
 
@@ -25,6 +25,12 @@ export default function Item({ seller, handleSelectedItems, item, selectedItems 
         }else{
             itemRef.current.style = "background-color:white";
         }
+
+        if(item.id == mappedid){
+            itemRef.current.style = "background-color:#90EE90";
+        }else{
+            itemRef.current.style = "background-color:white";
+        }
     })
 
     return (
@@ -39,8 +45,8 @@ export default function Item({ seller, handleSelectedItems, item, selectedItems 
                     <div className="itemTitle">{item.title} <span className="itemPrice">{item.price}</span></div>
                  
                     <div className="itemDesc">{item.description}</div>
-                    <div className="button" onClick={selectItem}>THIS IS THE ITEM</div>
-                    <div className="button" onClick={goToProduct}>GO TO URL</div>
+                    <div className="button" onClick={selectItem}>MATCH PRODUCT</div>
+                    <div className="button" onClick={goToProduct}>FIND ON {seller} </div>
                 </div>
             </div>
         </>

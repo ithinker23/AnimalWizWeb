@@ -4,7 +4,7 @@ import Item from './Item'
 
 export default function SellerCol({ seller, data, selectedItems, handleSelectedItems,pid, socket, scraperStatus, setScraperStatus}) {
 
-    const [isMapped, setIsMapped] = useState("")
+    const [mappedItem, setMappedItem] = useState()
     const urlTextRef = useRef()
     
     useEffect(()=>{
@@ -13,23 +13,31 @@ export default function SellerCol({ seller, data, selectedItems, handleSelectedI
 
     async function checkMappingState(){
         let res = await axios.post('http://localhost:5000/items/checkMappingState', {seller:seller, pid:pid})
-        setIsMapped(res.data)
+        setMappedItem(res.data)
     }
 
     async function scrapeUrl(){
-        socket.emit('startScraperItemSelection', {pid:pid, scraper:seller, url:urlTextRef.current.value, mode:3})
+        socket.emit('startScraperItems', {pid:pid, scraper:seller, url:urlTextRef.current.value, mode:3})
         setScraperStatus(true)
     }
-
+    function addTick(){
+         if(mappedItem == "-1"){
+            return <></>
+         }else{
+            return <img className='mappedItemIcon' src="tickMark.png"></img>
+         }
+    }
     return (
         <div className='sellerCol'>
             <div className='itemsCol'>
-                <div className='sellerTitle'>{seller} items is {isMapped}</div>
+                <div className='sellerTitleWrapper'>
+                <div className='sellerTitle'>{seller}</div> {addTick()}
+                </div>
                 <div className='sellerItems'>
                     {
                         data[seller].data.map((item) => {
                             return (<>
-                                <Item selectedItems={selectedItems} item={item} seller={data[seller].seller} handleSelectedItems={handleSelectedItems} />
+                                <Item mappedid={mappedItem} selectedItems={selectedItems} item={item} seller={data[seller].seller} handleSelectedItems={handleSelectedItems} />
                             </>)
                         })
                     }

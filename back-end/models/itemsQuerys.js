@@ -1,9 +1,11 @@
 const client = require('./dbConnection');
 
-function getItems(table, pid, sortBy) {
+module.exports = {
+
+    getItems : (table, pid, sortBy) => {
     var query = "SELECT * FROM " + table + " WHERE pid = " + pid
 
-    if (sortBy != null){
+    if (sortBy != null) {
         query += " ORDER BY " + sortBy
     }
 
@@ -13,16 +15,68 @@ function getItems(table, pid, sortBy) {
             resolve(res)
         })
     })
-}
+},
 
-function updateMatches(ids, matchesDB, sellers, prevDB) {
+getscrapedcount: (seller) => {
+    return new Promise((resolve, reject) => {
+        let query = "SELECT COUNT(*) FROM (SELECT distinct pid FROM " + seller + ") as temp"
+
+        client.query(query, (err, res) => {
+            if (err) reject(err)
+
+            resolve(res.rows[0].count)
+        })
+    })
+
+
+},
+
+getnonscrapedcount: (seller) =>  {
+    return new Promise((resolve, reject) => {
+        let query = "SELECT COUNT(*) FROM (SELECT aw.pid FROM animal_wiz aw LEFT JOIN " + seller + " sel ON sel.pid = aw.pid WHERE sel.pid IS NULL and aw.title != '') as temp"
+
+        client.query(query, (err, res) => {
+            if (err) reject(err)
+
+            resolve(res.rows[0].count)
+        })
+    })
+
+},
+
+getmappedcount : (seller) => {
+    return new Promise((resolve, reject) => {
+        let query = "SELECT COUNT(*) FROM (SELECT " + seller + " FROM aw_matches WHERE " + seller + " is not null) as temp"
+
+        client.query(query, (err, res) => {
+            if (err) reject(err)
+
+            resolve(res.rows[0].count)
+        })
+    })
+
+},
+
+getNullItems: (seller) => {
+    return new Promise((resolve, reject) => {
+        let query = "SELECT aw.title FROM animal_wiz aw LEFT JOIN " + seller + " sel ON sel.pid = aw.pid WHERE sel.pid IS NULL and aw.title != ''"
+
+        client.query(query, (err, res) => {
+            if (err) reject(err)
+
+            resolve(res.rows)
+        })
+    })
+},
+
+updateMatches: (ids, matchesDB, sellers, prevDB) =>  {
 
     var query = "SELECT * FROM " + matchesDB + " WHERE " + prevDB + "=" + ids.pid
     return new Promise((resolve, reject) => {
         client.query(query, (err, res) => {
             if (err) throw (err)
             if (res.rows.length == 0) {
-                query = "INSERT INTO " + matchesDB + '('+prevDB+','
+                query = "INSERT INTO " + matchesDB + '(' + prevDB + ','
                 let i = 0
                 sellers.forEach((seller) => {
 
@@ -33,12 +87,12 @@ function updateMatches(ids, matchesDB, sellers, prevDB) {
                     i++
                 })
                 query += ") values (" + ids.pid + ','
-                
+
                 i = 0
                 sellers.forEach((seller) => {
                     query += ids[seller]
-                    if(sellers.length -1 != i)
-                    query += ','
+                    if (sellers.length - 1 != i)
+                        query += ','
                     i++
                 })
 
@@ -51,16 +105,16 @@ function updateMatches(ids, matchesDB, sellers, prevDB) {
             } else {
                 query = "UPDATE " + matchesDB + " SET "
                 let i = 0
-                sellers.forEach(seller=>{
-            
+                sellers.forEach(seller => {
+
                     query += seller + "=" + ids[seller]
 
-                    if(sellers.length -1 != i){
-                        query+= ','
+                    if (sellers.length - 1 != i) {
+                        query += ','
                     }
                     i++
                 })
-                query += " WHERE " + prevDB + " = " + ids.pid 
+                query += " WHERE " + prevDB + " = " + ids.pid
 
                 client.query(query, (err, res) => {
                     if (err) throw (err)
@@ -69,9 +123,9 @@ function updateMatches(ids, matchesDB, sellers, prevDB) {
             }
         })
     })
-}
+},
 
-function getPidList(table) {
+getPidList : (table) =>  {
     var query = "SELECT pid FROM " + table + " WHERE title != ''"
 
     return new Promise((resolve, reject) => {
@@ -81,9 +135,9 @@ function getPidList(table) {
 
         })
     })
-}
+},
 
-async function getMatches(matchesDB, sellers, pricesDB, prevDB) {
+getMatches: async (matchesDB, sellers, pricesDB, prevDB) =>  {
 
     let query = "SELECT * FROM " + matchesDB
 
@@ -111,51 +165,33 @@ async function getMatches(matchesDB, sellers, pricesDB, prevDB) {
 
         let matchRes = await client.query(query)
 
-        query = "SELECT updated_price FROM " + pricesDB + " WHERE pid = " + res.rows[i][prevDB]
-
-        let priceRes = await client.query(query)
-
-        match[prevDB] = { image_src:matchRes.rows[0].image_src, pid: matchRes.rows[0].pid, title: matchRes.rows[0].title, variantPrice: matchRes.rows[0].variant_price, costPerItem: matchRes.rows[0].cost_per_item, seller: prevDB, updatedPrice: priceRes.rows[0] ? priceRes.rows[0].updated_price : "Not Updated Yet" }
+        match[prevDB] = { image_src: matchRes.rows[0].image_src, pid: matchRes.rows[0].pid, title: matchRes.rows[0].title, variantPrice: matchRes.rows[0].variant_price, costPerItem: matchRes.rows[0].cost_per_item, seller: prevDB}
 
         matchesList.push(match)
     }
 
     return (matchesList)
-}
+},
 
-async function updatePrices(pid, price, pricesDB) {
-    let query = "SELECT pid FROM " + pricesDB + " WHERE pid = " + pid
-    client.query(query, (err, res) => {
-        if (err) throw err
-        if (res.rows.length == 0) {
-            query = "INSERT INTO " + pricesDB + " (pid, updated_price) VALUES ('" + pid + "', '" + price + "')"
-            client.query(query)
-        } else {
-            query = "UPDATE " + pricesDB + " SET updated_price = " + price + " WHERE pid = " + pid
-            client.query(query)
+checkMappingState: (seller, pid) =>  {
+
+    return new Promise(async (resolve, reject) => {
+        let query = "SELECT  " + seller + " FROM aw_matches WHERE animal_wiz = " + pid
+
+        try {
+            let res = await client.query(query)
+            if (res.rows.length > 0) {
+                if (res.rows[0][seller] == null) {
+                    resolve("-1")
+                } else {
+                    resolve(String(res.rows[0][seller]))
+                }
+            } else {
+                resolve("-1")
+            }
+        } catch (err) {
+            reject(err)
         }
     })
 }
-
-function checkMappingState(seller, pid){
-
-    return new Promise( async (resolve, reject) => {
-    let query = "SELECT  " + seller + " FROM aw_matches WHERE animal_wiz = " + pid
-
-    try{
-        let res = await client.query(query)
-        if(res.rows.length > 0){
-            if(res.rows[0][seller] == null){
-                resolve("Not Mapped")
-            }else{
-                resolve("Mapped")
-            }
-        }else{
-            resolve("Not Mapped")
-        }
-    } catch(err){
-        reject(err)
-    }
-})
 }
-module.exports = { getItems, updateMatches, getPidList, getMatches, updatePrices, checkMappingState }

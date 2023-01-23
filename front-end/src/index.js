@@ -12,7 +12,6 @@ socket.emit('registeruser')
 const sellers = ["chewy",'amazon']
 const prevDB = "animal_wiz"
 const matchesDB = "aw_matches"
-const pricesDB = "aw_changed_prices"
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -22,7 +21,7 @@ root.render(
       <Routes>
         <Route path='/' element={<Home socket={socket} sellers={sellers}/>}/>
         <Route path="/findItems" element={<FindItems socket={socket} sellers={sellers} prevDB={prevDB} matchesDB={matchesDB}/>} />
-        <Route path="/priceOptimization" element={<PriceOptimization sellers={sellers} prevDB={prevDB} matchesDB={matchesDB} pricesDB={pricesDB}/>} />
+        <Route path="/priceOptimization" element={<PriceOptimization sellers={sellers} prevDB={prevDB} matchesDB={matchesDB}/>} />
       </Routes>
       </Router>
   </>

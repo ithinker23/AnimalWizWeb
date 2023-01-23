@@ -1,7 +1,7 @@
 import React from 'react'
 import { useState } from 'react'
 
-export default function NotScrapedItemsList({ seller, items }) {
+export default function NotScrapedItemsList({ seller, items,startScraperHome }) {
     const showPerPage = 10
     const [page, setPage] = useState(1)
 
@@ -22,6 +22,7 @@ export default function NotScrapedItemsList({ seller, items }) {
             <div className='navPrev'>{page} / {Math.round((items.length) / showPerPage)}</div>
             <div className='navButton button' onClick={() => { setPage((page) => { if (page <= (items.length) / showPerPage){ return page + 1}else{return page} }) }}>Next</div>
         </div>
+        <div className='button' onClick={()=>{startScraperHome(seller)}}> START {seller} SCRAPER</div>
     </div>
     )
 }

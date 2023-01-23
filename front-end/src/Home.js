@@ -12,26 +12,49 @@ import { Bar } from 'react-chartjs-2';
 import NotScrapedItemsList from './NotScrapedItemsList'
 
 export default function Home({ sellers, socket }) {
-  let initItemData = {}
-  sellers.forEach(seller => {
-    initItemData[seller + " nullPids"] = []
+   let initItemData = {}
+   sellers.forEach(seller => {
+     initItemData[seller] = {}
+     initItemData[seller]['nullItems'] = []
   });
-  console.log(initItemData)
-  const [graphData, setGraphData] = useState({})
+
+  let initGraphData = {}
+  sellers.forEach(seller => {
+    initGraphData[seller] = {}
+ });
+  const [graphData, setGraphData] = useState(initGraphData)
   const [itemData, setItemData] = useState(initItemData)
 
   useEffect(() => {
-    socket.emit('startPostingData', sellers)
 
-    socket.on("postGraphData", (data) => {
-      setGraphData(data)
+    socket.emit('getHomeData', sellers)
+    socket.on('homeData', (data)=>{
+      setGraphData(prevData => {
+        sellers.forEach(seller=>{
+          prevData[seller] = data['graphData'][seller]
+        })
+        return prevData
+      })
+      setItemData(data['itemData'])
     })
 
-    socket.on("postItemData", (data) => {
-      setItemData(data)
+    socket.on("homeDataUpdate", (data) => {
+      setGraphData(prevData => {
+        let newData = {...prevData}
+        newData[data.seller] = data['graphData']
+        return newData
+      })
+      setItemData(prevData => {
+        let newData = {...prevData}
+         newData[data.seller] = data['itemData']
+         return newData
+       })
     })
-
   }, [socket])
+
+  function startScraperHome(seller){
+    socket.emit('startScraperHome', {scraper:seller, mode:2})
+  }
 
   ChartJS.register(
     CategoryScale,
@@ -62,17 +85,17 @@ export default function Home({ sellers, socket }) {
     datasets: [
       {
         label: 'Scraped Pids',
-        data: labels.map((label) => graphData[label + " foundPids"]),
+        data: labels.map((label) => graphData[label]['foundPids']),
         backgroundColor: 'green',
       },
       {
         label: 'Non-Scraped Pids',
-        data: labels.map((label) => graphData[label + " nullPids"]),
+        data: labels.map((label) => graphData[label]['nullPids']),
         backgroundColor: 'red',
       },
       {
         label: 'Mapped Pids',
-        data: labels.map((label) => graphData[label + " mappedPids"]),
+        data: labels.map((label) => graphData[label]['mappedPids']),
         backgroundColor: 'Blue',
       },
     ],
@@ -83,16 +106,16 @@ export default function Home({ sellers, socket }) {
       <div className='homeGraphs'>
         <Bar options={options} data={data} />
       </div>
-      <div className='homeNotScrapedItems'>
+       <div className='homeNotScrapedItems'>
         
         {
           sellers.map((seller) => {
-            return <NotScrapedItemsList seller={seller} items={itemData[seller + ' nullPids']}/> 
+            return <NotScrapedItemsList startScraperHome={startScraperHome} seller={seller} items={itemData[seller]['nullItems']}/> 
           })
 
         }
         
-      </div>
+      </div> 
     </div>
   </>)
 }

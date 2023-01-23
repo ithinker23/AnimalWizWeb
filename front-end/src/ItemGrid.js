@@ -34,7 +34,7 @@ export default function ItemGrid({sellers, prevDB, matchesDB, socket}) {
     }
 
     useEffect(() => {
-        socket.on('setItems',(reqdata)=>{
+        socket.on('scraperItems',(reqdata)=>{
             setScraperStatus(false)
             setData((prevData)=>{
                 prevData[reqdata.seller] = { data: reqdata.data, seller: reqdata.seller }
