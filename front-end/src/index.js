@@ -9,7 +9,7 @@ import io from 'socket.io-client'
 
 const socket = io.connect('http://localhost:5001')
 socket.emit('registeruser')
-const sellers = ["chewy",'amazon']
+const sellers = ["chewy",'amazon','petsmart']
 const storeDB = "animal_wiz"
 
 const root = ReactDOM.createRoot(document.getElementById('root'));

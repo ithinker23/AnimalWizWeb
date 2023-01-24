@@ -9,7 +9,6 @@ export default function PriceOptimization({ sellers, storeDB}) {
     async function getPriceIds() {
         try {
             let res = await axios.post('http://localhost:5000/items/getMatches', {sellers:sellers, store_name:storeDB })
-            console.log(res.data)
             setMatches(res.data)
 
         } catch (err) {

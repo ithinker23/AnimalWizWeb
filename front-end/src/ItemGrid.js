@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import ItemPrev from './ItemPrev'
-import axios from 'axios'
 import ItemGridFilter from './ItemGridFilter'
 import SellerCol from './SellerCol'
 
