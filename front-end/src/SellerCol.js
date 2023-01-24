@@ -11,6 +11,14 @@ export default function SellerCol({ selectItem, seller, data, pid, socket, scrap
         checkMappingState()
     },[pid])
 
+    useEffect(()=>{
+        socket.on('postMappedItem', (data) => {
+            if(data['seller'] == seller){
+            setMappedItem(data['id'])
+        }
+        })
+    },[socket])
+
     async function checkMappingState(){
         let res = await axios.post('http://localhost:5000/items/checkMappingState', {seller:seller, pid:pid})
         setMappedItem(res.data)
@@ -27,6 +35,7 @@ export default function SellerCol({ selectItem, seller, data, pid, socket, scrap
             return <img className='mappedItemIcon' src="tickMark.png"></img>
          }
     }
+    
     return (
         <div className='sellerCol'>
             <div className='itemsCol'>

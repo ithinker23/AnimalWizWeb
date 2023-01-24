@@ -22,8 +22,6 @@ export default function ItemGrid({sellers, storeDB, socket}) {
             })
         })
 
-        socket.on('mappedItems')
-
     }, [socket])
 
     function selectItem(pid, id, seller){

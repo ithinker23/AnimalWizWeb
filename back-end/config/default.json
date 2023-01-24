@@ -8,6 +8,8 @@
   },
     "tables": {
       "matchesDB": "aw_matches",
-      "urlsDB": "aw_scraper_urls"
+      "urlsDB": "aw_scraper_urls",
+      "pricesDB": "aw_price_history",
+      "storeDB" : "animal_wiz"
   }
 }

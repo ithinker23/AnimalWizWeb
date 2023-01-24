@@ -20,7 +20,7 @@ root.render(
       <Routes>
         <Route path='/' element={<Home socket={socket} sellers={sellers}/>}/>
         <Route path="/findItems" element={<FindItems socket={socket} sellers={sellers} storeDB={storeDB}/>} />
-        <Route path="/priceOptimization" element={<PriceOptimization sellers={sellers} storeDB={storeDB}/>} />
+        <Route path="/priceOptimization" element={<PriceOptimization socket={socket} sellers={sellers} storeDB={storeDB}/>} />
       </Routes>
       </Router>
   </>

@@ -34,7 +34,7 @@ getscrapedcount: (seller) => {
 
 getnonscrapedcount: (seller) =>  {
     return new Promise((resolve, reject) => {
-        let query = "SELECT COUNT(*) FROM (SELECT aw.pid FROM animal_wiz aw LEFT JOIN " + seller + " sel ON sel.pid = aw.pid WHERE sel.pid IS NULL and aw.title != '') as temp"
+        let query = "SELECT COUNT(*) FROM (SELECT aw.pid FROM " + config.get('tables.storeDB') + " aw LEFT JOIN " + seller + " sel ON sel.pid = aw.pid WHERE sel.pid IS NULL and aw.title != '') as temp"
 
         client.query(query, (err, res) => {
             if (err) reject(err)
@@ -47,11 +47,11 @@ getnonscrapedcount: (seller) =>  {
 
 getmappedcount : (seller) => {
     return new Promise((resolve, reject) => {
-        let query = "SELECT COUNT(*) FROM (SELECT " + seller + " FROM aw_matches WHERE " + seller + " is not null) as temp"
-
+        let query = "SELECT COUNT(*) FROM (SELECT " + seller + " FROM " + config.get('tables.matchesDB') + " WHERE " + seller + " is not null) as temp"
+        console.log(seller)
         client.query(query, (err, res) => {
             if (err) reject(err)
-
+            console.log(res.rows[0])
             resolve(res.rows[0].count)
         })
     })
@@ -60,7 +60,7 @@ getmappedcount : (seller) => {
 
 getNullItems: (seller) => {
     return new Promise((resolve, reject) => {
-        let query = "SELECT aw.title FROM animal_wiz aw LEFT JOIN " + seller + " sel ON sel.pid = aw.pid WHERE sel.pid IS NULL and aw.title != ''"
+        let query = "SELECT aw.title FROM " + config.get('tables.storeDB') + " aw LEFT JOIN " + seller + " sel ON sel.pid = aw.pid WHERE sel.pid IS NULL and aw.title != ''"
 
         client.query(query, (err, res) => {
             if (err) reject(err)
@@ -71,10 +71,27 @@ getNullItems: (seller) => {
 },
 
 updateMatches: (pid, id, seller) =>  {
-    query = "SELECT "
+    return new Promise((resolve,reject)=>{
+        query = "SELECT " + seller + " FROM " + config.get('tables.matchesDB') + " WHERE "+ config.get('tables.storeDB') + " = " + pid
 
-    client.query(query)
+        client.query(query, (err,res)=>{
+            if(err) reject(err)
 
+            if(res.rows.length == 0){
+                query = 'INSERT INTO ' + config.get('tables.matchesDB') + '('+ config.get('tables.storeDB') +','+ seller +') VALUES ('+ pid +','+ id +')'
+                client.query(query, (err,res) => {
+                    if (err) reject (err)
+                    resolve({id:id, seller:seller, pid:pid})
+                })
+            }else{
+                query = 'UPDATE ' + config.get('tables.matchesDB') + ' SET ' + seller + ' = ' + id + ' WHERE ' + config.get('tables.storeDB') + ' = ' + pid
+                client.query(query, (err,res) => {
+                    if (err) reject (err)
+                    resolve({id:id, seller:seller, pid:pid})
+                })
+            }
+        })
+    })
 },
 
 getPidList : (table) =>  {
@@ -103,13 +120,14 @@ getMatches: async (sellers, store_name) =>  {
 
         sellers.forEach(async (seller) =>{
             if (res.rows[i][seller] === null) {
-                match[seller] = { price: "Unlisted", seller: seller }
+                match[seller] = { price: [], seller: seller }
             } else {
 
-                query = "SELECT * FROM " + seller + " WHERE id = " + res.rows[i][seller]
+                query = "SELECT price,date_stamp FROM " + config.get('tables.pricesDB') + " WHERE store_name = '" + seller + "' and id = " + res.rows[i][seller] + " and pid = " + res.rows[i][store_name] + " order by price_id DESC LIMIT 3"
 
-                let sellerRes = await client.query(query)
-                match[seller] = { price: sellerRes.rows[0].price ? sellerRes.rows[0].price : "Need to check website", seller: seller }
+                let priceRes = await client.query(query)
+
+                match[seller] = { price: priceRes.rows, seller: seller }
             }
         })
 
@@ -128,7 +146,7 @@ getMatches: async (sellers, store_name) =>  {
 checkMappingState: (seller, pid) =>  {
 
     return new Promise(async (resolve, reject) => {
-        let query = "SELECT  " + seller + " FROM aw_matches WHERE animal_wiz = " + pid
+        let query = "SELECT " + seller + " FROM " + config.get('tables.matchesDB') + " WHERE " + config.get('tables.storeDB') + " = " + pid
 
         try {
             let res = await client.query(query)

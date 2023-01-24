@@ -2,26 +2,24 @@ import axios from "axios"
 import { useEffect, useState } from "react"
 import MatchRow from './MatchRow'
 
-export default function PriceOptimization({ sellers, storeDB}) {
+export default function PriceOptimization({ sellers, storeDB, socket }) {
 
     const [matches, setMatches] = useState([])
 
-    async function getPriceIds() {
-        try {
-            let res = await axios.post('http://localhost:5000/items/getMatches', {sellers:sellers, store_name:storeDB })
-            setMatches(res.data)
+    useEffect(() => {
+        socket.emit('getMatches', {sellers:sellers, store_name:storeDB})
 
-        } catch (err) {
-            throw err
-        }
+        socket.on('postMatches', (data)=>{
+            setMatches(data)
+        })
+    }, [socket])
+
+    function updatePrices(){
+        socket.emit('startScraperPriceOptim', {scrapers:sellers})
     }
 
-
-    useEffect(() => {
-        getPriceIds()
-    }, [])
-
     return (<>
+        <div className="button updateMatchesButton" onClick={updatePrices}> UPDATE PRICES </div>
         <div className="PriceOptimizationWindow">
             {matches.map((match,index) => {
                 return <MatchRow match={match} sellers={sellers} storeDB={storeDB} index={index}/>

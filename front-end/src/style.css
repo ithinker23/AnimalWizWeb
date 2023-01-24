@@ -308,3 +308,14 @@ body {
     display: flex;
     flex-direction: row;
 }
+.matchDateTime{
+    font-size: 13px;
+}
+.match > .matchDateTime:not(:first-child){
+    color:red
+}
+
+.updateMatchesButton{
+    width:400px;
+    margin:auto;
+}

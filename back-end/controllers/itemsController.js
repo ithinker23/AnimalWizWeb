@@ -24,15 +24,6 @@ module.exports = {
             res.sendStatus(400)
         }
     },
-    getMatches: async (req,res)=>{
-        try {
-            let result = await itemsQuerys.getMatches(req.body.sellers, req.body.store_name)
-            res.status(200).json(result)
-        } catch (err) {
-            console.log(err)
-            res.sendStatus(400)
-        }
-    },
 
     checkMappingState: async (req,res)=>{
         try {

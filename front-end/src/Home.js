@@ -53,7 +53,7 @@ export default function Home({ sellers, socket }) {
   }, [socket])
 
   function startScraperHome(seller){
-    socket.emit('startScraperHome', {scraper:seller, mode:2})
+    socket.emit('startScraper', {scraper:seller, mode:2})
   }
 
   ChartJS.register(
