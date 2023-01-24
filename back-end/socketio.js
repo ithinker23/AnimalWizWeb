@@ -23,12 +23,12 @@ let KleinID
 
 io.on("connection", (socket)=>{
 
-  socket.on('registerklein', ()=>{
+  socket.on('registercelery', ()=>{
     KleinID = socket.id
     console.log('KLEIN CONNECTED... ID:' + KleinID)
 
     socket.on('disconnect', function () {
-      console.log('klein server disconnected');
+      console.log('celery server disconnected');
     });
   })
 

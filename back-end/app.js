@@ -19,9 +19,6 @@ app.use('/', _404Route)
 const urlsRoute = require('./routes/urlsRoute');
 app.use('/urls', urlsRoute)
 
-const scraperRoute = require('./routes/scraperRoute');
-app.use('/scrapers', scraperRoute)
-
 app.listen(port, () => {
   console.log(`listening on port ${port}`)
 })
