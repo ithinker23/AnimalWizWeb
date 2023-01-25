@@ -26,6 +26,19 @@ class Pipeline:
 
 
     def process_item(self, item, spider):
+        ## Create quotes table if none exists
+        self.cur.execute("""
+        CREATE TABLE IF NOT EXISTS """+ spider.table_name +"""(
+            id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+            pid int NOT NULL REFERENCES animal_wiz (pid),
+            title text,
+            images text[],
+            p_url text,
+            description text,
+            similarity integer
+        )
+        """)
+
         try:
             print(spider.table_name + " " + item['title'])
             if(item['id'] != None):
@@ -42,9 +55,16 @@ class Pipeline:
                     item['url'],
                     item["description"]))
 
+                self.cur.execute(" SELECT id FROM " + spider.table_name + " where pid = %s and title = %s", (
+                    item['pid'],
+                    item['title']
+                ))
+
+                id = self.cur.fetchall()[0][0]
+
                 self.cur.execute("""insert into """ + cfg['tables']['price_history'] + """(store_name, pid, id, price) VALUES ('""" + spider.table_name + """',%s,%s,%s)""", (                  
                         item['pid'],
-                        item['id'],
+                        id,
                         item['price']
                 ))
 

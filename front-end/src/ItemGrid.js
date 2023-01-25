@@ -11,11 +11,9 @@ export default function ItemGrid({expressAPI,sellers, storeDB, socket}) {
     })
     const [data, setData] = useState(initData)
     const [prevData, setPrevData] = useState({pid:null, images:[], title:"", description:"", price:""})
-    const [scraperStatus, setScraperStatus] = useState(false)
    
     useEffect(() => {
         socket.on('scraperItems',(reqdata)=>{
-            setScraperStatus(false)
             setData((prevData)=>{
                 prevData[reqdata.seller] = { data: reqdata.data, seller: reqdata.seller }
                 return prevData
@@ -37,7 +35,7 @@ export default function ItemGrid({expressAPI,sellers, storeDB, socket}) {
                 {
                     sellers.map(seller => {
                         return (
-                            <SellerCol expressAPI={expressAPI} selectItem={selectItem} scraperStatus={scraperStatus} setScraperStatus={setScraperStatus} setData={setData} initData={initData} socket={socket} seller={seller} data={data} pid={prevData.pid}/>
+                            <SellerCol expressAPI={expressAPI} selectItem={selectItem} setData={setData} initData={initData} socket={socket} seller={seller} data={data} pid={prevData.pid}/>
                         )
                     })
                 }

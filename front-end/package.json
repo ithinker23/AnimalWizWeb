@@ -13,6 +13,7 @@
     "@types/react": "^18.0.25",
     "@types/react-dom": "^18.0.9",
     "axios": "^1.2.0",
+    "env-cmd": "^10.1.0",
     "faker": "^6.6.6",
     "react": "^18.2.0",
     "react-chartjs-2": "^5.2.0",
@@ -24,7 +25,8 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "startdev": "env-cmd -f dev.env react-scripts start",
+    "startprod": "env-cmd -f .env react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"

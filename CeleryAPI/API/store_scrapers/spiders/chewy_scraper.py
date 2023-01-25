@@ -33,20 +33,6 @@ class ChewyScraperSpider(scrapy.Spider):
 
         self.search_url = urls[1]
 
-        ## Create quotes table if none exists
-        cur.execute("""
-        CREATE TABLE IF NOT EXISTS chewy(
-            id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-            pid int NOT NULL REFERENCES animal_wiz (pid),
-            title text,
-            images text[],
-            p_url text,
-            price text, 
-            description text,
-            similarity integer
-        )
-        """)
-
         if(self.updateMode == 1):
             #UPDATE MAPPED ITEMS
             cur.execute("SELECT chewy FROM " + cfg['tables']['matches'] + " WHERE chewy is not null")

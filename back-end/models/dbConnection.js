@@ -1,6 +1,8 @@
 const { Client } = require('pg')
 const config = require('config')
 
+console.log(config.get('database.host'))
+
 const client = new Client({
     host: config.get('database.host'),
     user: config.get('database.user'),

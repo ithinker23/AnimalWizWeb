@@ -96,7 +96,7 @@ io.on("connection", (socket)=>{
 
       socket.to(KleinID).emit('startScraper', scraperData)
 
-      client.on('channel', async function(msg) {
+      client.on('notifcation', async function(msg) {
           
         let res = await itemQuerys.getItems(scraperData.scraper, scraperData.pid, "similarity")
 
