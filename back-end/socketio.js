@@ -14,7 +14,6 @@ const io = new Server(server, {
 })
 
 server.listen(5001,() => {
-  console.log("SOCKETIO RUNNING ON "+ 5001)
 })
 
 let KleinID
@@ -23,17 +22,10 @@ io.on("connection", (socket)=>{
 
   socket.on('registercelery', ()=>{
     KleinID = socket.id
-    console.log('KLEIN CONNECTED... ID:' + KleinID)
-
-    socket.on('disconnect', function () {
-      console.log('celery server disconnected');
-    });
   })
 
   
   socket.on('registeruser', ()=>{
-
-    console.log("USER CONNECTED: " + socket.id)
 
     socket.on('getHomeData', async (sellers)=>{
 
@@ -139,7 +131,6 @@ io.on("connection", (socket)=>{
       socket.emit('postMappedItem', res)
     }) 
     socket.on('disconnect', function () {
-      console.log('A user disconnected');
     });
 
   })

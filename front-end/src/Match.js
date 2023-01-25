@@ -1,10 +1,5 @@
-import { useEffect } from "react"
 
 export default function Match({item}){
-
-    useEffect(()=>{
-        console.log(item)
-    })
 
     function convertTime(full_date){
        let date = new Date(full_date)

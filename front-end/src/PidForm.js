@@ -29,7 +29,6 @@ export default function PidForm({ initData, setData, sellers, storeDB, setPrevDa
   }
 
   async function getItems() {
-    console.log("UPDATING ITEMS")
     let init = initData
     sellers.forEach(async (seller) => {
       let res = await axios.post("http://localhost:5000/items/getItems", { table: seller, pid: pid, sortBy: "similarity" })

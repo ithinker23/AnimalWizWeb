@@ -48,10 +48,8 @@ getnonscrapedcount: (seller) =>  {
 getmappedcount : (seller) => {
     return new Promise((resolve, reject) => {
         let query = "SELECT COUNT(*) FROM (SELECT " + seller + " FROM " + config.get('tables.matchesDB') + " WHERE " + seller + " is not null) as temp"
-        console.log(seller)
         client.query(query, (err, res) => {
             if (err) reject(err)
-            console.log(res.rows[0])
             resolve(res.rows[0].count)
         })
     })

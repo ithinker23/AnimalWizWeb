@@ -19,7 +19,5 @@ app.use('/', _404Route)
 const urlsRoute = require('./routes/urlsRoute');
 app.use('/urls', urlsRoute)
 
-app.listen(port, () => {
-  console.log(`listening on port ${port}`)
-})
+app.listen(port)
 

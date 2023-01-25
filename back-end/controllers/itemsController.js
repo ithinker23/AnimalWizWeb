@@ -11,7 +11,6 @@ module.exports = {
             await itemsQuerys.updateMatches()
             res.sendStatus(200)
         } catch (err) {
-            console.log(err)
             res.sendStatus(400)
         }
     },
@@ -20,7 +19,6 @@ module.exports = {
             let result = await itemsQuerys.getPidList(req.body.table)
             res.status(200).json(result)
         } catch (err) {
-            console.log(err)
             res.sendStatus(400)
         }
     },
@@ -30,7 +28,6 @@ module.exports = {
             let result = await itemsQuerys.checkMappingState(req.body.seller, req.body.pid)
             res.send(result)
         } catch (err) {
-            console.log(err)
             res.sendStatus(400)
         }
 
