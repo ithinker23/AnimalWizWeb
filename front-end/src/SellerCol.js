@@ -1,8 +1,7 @@
-import axios from 'axios'
 import React, { useEffect, useState, useRef } from 'react'
 import Item from './Item'
 
-export default function SellerCol({ selectItem, seller, data, pid, socket, scraperStatus, setScraperStatus}) {
+export default function SellerCol({ expressAPI, selectItem, seller, data, pid, socket, scraperStatus, setScraperStatus}) {
 
     const [mappedItem, setMappedItem] = useState()
     const urlTextRef = useRef()
@@ -13,14 +12,14 @@ export default function SellerCol({ selectItem, seller, data, pid, socket, scrap
 
     useEffect(()=>{
         socket.on('postMappedItem', (data) => {
-            if(data['seller'] == seller){
+            if(data['seller'] === seller){
             setMappedItem(data['id'])
         }
         })
     },[socket])
 
     async function checkMappingState(){
-        let res = await axios.post('http://localhost:5000/items/checkMappingState', {seller:seller, pid:pid})
+        let res = await expressAPI.post('/items/checkMappingState', {seller:seller, pid:pid})
         setMappedItem(res.data)
     }
 
@@ -29,7 +28,7 @@ export default function SellerCol({ selectItem, seller, data, pid, socket, scrap
         setScraperStatus(true)
     }
     function addTick(){
-         if(mappedItem == "-1"){
+         if(mappedItem === "-1"){
             return <></>
          }else{
             return <img className='mappedItemIcon' src="tickMark.png"></img>

@@ -20,12 +20,7 @@ class AmazonScraperSpider(scrapy.Spider):
 
     table_name = 'amazon'
     name = 'amazon_scraper'
-    custom_settings = {
-        "ITEM_PIPELINES": {
-        'store_scrapers.pipelines.Pipeline': 300,
-        }
-    }
-    
+
     def start_requests(self):
         self.updateMode = self.mode
         ## Create/Connect to database

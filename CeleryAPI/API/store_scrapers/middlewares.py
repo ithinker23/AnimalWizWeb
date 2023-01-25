@@ -15,7 +15,7 @@ class StoreScrapersHeaderMiddleware:
         user_agent = random.choice(USER_AGENT_LIST)
         if user_agent:
             request.headers['User-Agent'] = user_agent
-            #print("[REQUEST HEADERS]: " + str(request.headers))
+            print("[REQUEST HEADERS]: " + str(request.headers))
 
 class StoreScrapersSpiderMiddleware:
     # Not all methods need to be defined. If a method is not defined,

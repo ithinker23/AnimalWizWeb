@@ -18,7 +18,7 @@ export default function Item({ seller, item, mappedid, selectItem }) {
     }
     useEffect(()=>{
 
-        if(item.id == mappedid){
+        if(item.id === mappedid){
             itemRef.current.style = "background-color:#90EE90";
         }else{
             itemRef.current.style = "background-color:white";

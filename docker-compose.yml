@@ -1,0 +1,56 @@
+version: "3.8"
+services:
+
+  database:
+    image: postgres:15.1-alpine
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=admin12345
+    expose:
+      - '5432'
+    volumes:
+      - C:\Program Files\PostgreSQL\15:/var/lib/postgresql
+    restart: always
+    networks:
+      animalwiz-backnet:
+
+  express-server:
+    build: 
+      context: ./back-end
+      dockerfile: Dockerfile.dev
+    depends_on:
+      - database
+    ports:
+      - '5000:5000'
+      - '5001:5001'
+    restart: always
+    networks:
+      animalwiz-backnet:
+      animalwiz-frontnet:
+
+  celery-api:
+    build:
+      context: ./CeleryAPI
+      dockerfile: Dockerfile.dev
+    depends_on:
+      - express-server
+    restart: always
+    networks:
+      animalwiz-backnet:
+
+  react-client:
+    build: 
+      context: ./front-end
+      dockerfile: Dockerfile.dev
+    depends_on:
+      - express-server
+      - database
+    ports:
+      - '3000:3000'
+    restart: always
+    networks:
+      animalwiz-frontnet:
+
+networks:
+  animalwiz-frontnet:
+  animalwiz-backnet:

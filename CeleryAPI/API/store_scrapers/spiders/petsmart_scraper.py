@@ -18,12 +18,6 @@ class PetSmartScraperSpider(scrapy.Spider):
 
     table_name = 'petsmart'
 
-    custom_settings = {
-        "ITEM_PIPELINES": {
-        'store_scrapers.pipelines.Pipeline': 300,
-        }
-    }
-
     updateMode = False 
 
     def start_requests(self):

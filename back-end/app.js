@@ -5,7 +5,7 @@ const bodyParser = require('body-parser')
 const cors = require('cors');
 const io = require('./socketio')
 
-app.use(cors({origin: 'http://localhost:3000', credentials: true}));
+app.use(cors({origin: '*', credentials: true}));
 
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())

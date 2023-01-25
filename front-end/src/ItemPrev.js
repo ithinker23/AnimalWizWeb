@@ -1,8 +1,7 @@
-import axios from 'axios';
 import { useEffect, useState } from 'react';
 import PidForm from './PidForm';
 
-export default function ItemPrev({ item, updateMatchesDB, setSelectedItems, initData, setPrevData, storeDB, data, setData, sellers, selectedItemsInitData }) {
+export default function ItemPrev({ expressAPI, item, updateMatchesDB, setSelectedItems, initData, setPrevData, storeDB, data, setData, sellers, selectedItemsInitData }) {
     
     const [urls,setUrls] = useState([])
 
@@ -11,7 +10,7 @@ export default function ItemPrev({ item, updateMatchesDB, setSelectedItems, init
     },[item])
 
     async function getUrls(){
-        let res = await axios.post('http://localhost:5000/urls/getSearchUrl', {stores:sellers, searchQuery:item.title})
+        let res = await expressAPI.post('/urls/getSearchUrl', {stores:sellers, searchQuery:item.title})
         setUrls(res.data)
     }
 
@@ -37,7 +36,7 @@ export default function ItemPrev({ item, updateMatchesDB, setSelectedItems, init
                     }
                 </div>
                 <div className="itemContent">
-                <PidForm  selectedItemsInitData={selectedItemsInitData} updateMatchesDB={updateMatchesDB} setSelectedItems={setSelectedItems} initData={initData} setPrevData={setPrevData} storeDB={storeDB} data={data} setData={setData} sellers={sellers} />
+                <PidForm  expressAPI={expressAPI} selectedItemsInitData={selectedItemsInitData} updateMatchesDB={updateMatchesDB} setSelectedItems={setSelectedItems} initData={initData} setPrevData={setPrevData} storeDB={storeDB} data={data} setData={setData} sellers={sellers} />
                     <div className="itemTitle">{item.title}</div>
 
                     <div className="itemDesc">{item.tags}</div>

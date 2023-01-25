@@ -3,7 +3,7 @@ import ItemPrev from './ItemPrev'
 import ItemGridFilter from './ItemGridFilter'
 import SellerCol from './SellerCol'
 
-export default function ItemGrid({sellers, storeDB, socket}) {
+export default function ItemGrid({expressAPI,sellers, storeDB, socket}) {
 
     var initData
     sellers.forEach((seller) => {
@@ -32,12 +32,12 @@ export default function ItemGrid({sellers, storeDB, socket}) {
         <ItemGridFilter/>
         <div className="button clearButton">Clear Selections</div>
         <div className='flexContent'> 
-            <ItemPrev item={prevData} initData={initData} setPrevData={setPrevData} storeDB={storeDB} data={data} setData={setData} sellers={sellers}/>
+            <ItemPrev expressAPI={expressAPI} item={prevData} initData={initData} setPrevData={setPrevData} storeDB={storeDB} data={data} setData={setData} sellers={sellers}/>
             <div className='itemGrid'>
                 {
                     sellers.map(seller => {
                         return (
-                            <SellerCol selectItem={selectItem} scraperStatus={scraperStatus} setScraperStatus={setScraperStatus} setData={setData} initData={initData} socket={socket} seller={seller} data={data} pid={prevData.pid}/>
+                            <SellerCol expressAPI={expressAPI} selectItem={selectItem} scraperStatus={scraperStatus} setScraperStatus={setScraperStatus} setData={setData} initData={initData} socket={socket} seller={seller} data={data} pid={prevData.pid}/>
                         )
                     })
                 }

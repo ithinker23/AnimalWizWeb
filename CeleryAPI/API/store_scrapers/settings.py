@@ -81,6 +81,9 @@ DOWNLOADER_MIDDLEWARES = {
     #'scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware': 110,
 }
 
+ITEM_PIPELINES = {
+'store_scrapers.pipelines.Pipeline': 300,
+} 
 # Disable cookies (enabled by default)
 COOKIES_ENABLED = True
 

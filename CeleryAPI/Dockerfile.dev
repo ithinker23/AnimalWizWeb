@@ -1,0 +1,8 @@
+FROM python:3.8-alpine
+RUN apk update && apk add gcc libffi-dev libpq-dev postgresql-dev python3-dev musl-dev
+
+WORKDIR /app
+COPY . .
+WORKDIR /app/API
+RUN pip install -r requirements.txt
+CMD ["python","celery_config.py"]

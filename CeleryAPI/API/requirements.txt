@@ -1,0 +1,8 @@
+celery==5.2.7
+python-socketio[client]==5.7.2
+itemadapter==0.7.0
+psycopg2==2.9.5
+Scrapy==2.7.1
+scrapy_selenium==0.0.7
+Twisted==22.10.0
+sqlalchemy==1.4.46

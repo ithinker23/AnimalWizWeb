@@ -1,7 +1,6 @@
-import axios from 'axios'
 import { useEffect, useState } from 'react'
 
-export default function PidForm({ initData, setData, sellers, storeDB, setPrevData }) {
+export default function PidForm({ expressAPI, initData, setData, sellers, storeDB, setPrevData }) {
 
   const [pid, setPid] = useState(null)
   const [pidList, setPidList] = useState([])
@@ -16,7 +15,7 @@ export default function PidForm({ initData, setData, sellers, storeDB, setPrevDa
 
   async function getPidList() {
     try {
-      let list = await axios.post("http://localhost:5000/items/getPidList", { table: storeDB })
+      let list = await expressAPI.post("/items/getPidList", { table: storeDB })
       let newList = []
       list.data.rows.forEach(pid => {
         newList.push(pid.pid)
@@ -31,12 +30,12 @@ export default function PidForm({ initData, setData, sellers, storeDB, setPrevDa
   async function getItems() {
     let init = initData
     sellers.forEach(async (seller) => {
-      let res = await axios.post("http://localhost:5000/items/getItems", { table: seller, pid: pid, sortBy: "similarity" })
+      let res = await expressAPI.post("/items/getItems", { table: seller, pid: pid, sortBy: "similarity" })
       init[seller] = { data: res.data.rows, seller: seller }
       setData(init)
     });
 
-    let res = await axios.post("http://localhost:5000/items/getItems", { table: storeDB, pid: pid })
+    let res = await expressAPI.post("/items/getItems", { table: storeDB, pid: pid })
     if (res.data.rows[0] !== undefined) {
       setPrevData(res.data.rows[0])
     }

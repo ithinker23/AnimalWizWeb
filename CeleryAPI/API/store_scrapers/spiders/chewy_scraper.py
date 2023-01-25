@@ -17,12 +17,6 @@ class ChewyScraperSpider(scrapy.Spider):
     name = 'chewy_scraper'
 
     table_name = 'chewy'
-
-    custom_settings = {
-        "ITEM_PIPELINES": {
-        'store_scrapers.pipelines.Pipeline': 300,
-        }
-    }
     
     def start_requests(self):
         self.updateMode = self.mode
