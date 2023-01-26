@@ -28,8 +28,7 @@ export default function ItemGrid({expressAPI,sellers, storeDB, socket}) {
     }
 
     return (<>
-        <ItemGridFilter/>
-        <div className="button clearButton">Clear Selections</div>
+    {/* <ItemGridFilter/> */}
         <div className='flexContent'> 
             <ItemPrev expressAPI={expressAPI} item={prevData} initData={initData} setPrevData={setPrevData} storeDB={storeDB} data={data} setData={setData} sellers={sellers}/>
             <div className='itemGrid'>

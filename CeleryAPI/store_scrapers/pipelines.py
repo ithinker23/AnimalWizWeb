@@ -40,7 +40,7 @@ class Pipeline:
         """)
 
         try:
-            print(spider.table_name + " " + item['title'])
+            print(spider.table_name + " pipeline: " + item['title'])
             if(item['id'] != None):
                 self.cur.execute("""select id from """ + spider.table_name + """ where id = '{id}' """.format(id=item['id']))
                 id = self.cur.fetchone()

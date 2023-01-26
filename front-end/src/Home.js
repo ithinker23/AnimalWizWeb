@@ -107,12 +107,11 @@ export default function Home({ sellers, socket }) {
         <Bar options={options} data={data} />
       </div>
        <div className='homeNotScrapedItems'>
-        
+
         {
           sellers.map((seller) => {
             return <NotScrapedItemsList startScraperHome={startScraperHome} seller={seller} items={itemData[seller]['nullItems']}/> 
-          })
-
+          })  
         }
         
       </div> 

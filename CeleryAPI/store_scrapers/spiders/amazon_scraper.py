@@ -51,6 +51,7 @@ class AmazonScraperSpider(scrapy.Spider):
 
             query_results = cur.fetchall()
             for result in query_results:
+                print("new pid: " + str(result[0]))
                 yield scrapy.Request(url=self.base_url + self.search_url + self.sanitizeQuery(result[1]), callback=self.parse, cb_kwargs={"pid":result[0], "id":None})
         else:
             #SCRAPE MANUAL ENTRY
@@ -66,6 +67,7 @@ class AmazonScraperSpider(scrapy.Spider):
 
         i_count = 0
         for link in links:
+            print("new link: " + link)
             yield SeleniumRequest(
                             url=self.base_url + link, 
                             callback=self.parse_product,
@@ -85,6 +87,7 @@ class AmazonScraperSpider(scrapy.Spider):
             
 
     def parse_product(self, response, pid, id):
+        print("parsing link")
         amazon_item = AmazonItem()
         amazon_item["pid"] = pid
         amazon_item['url'] = response.url

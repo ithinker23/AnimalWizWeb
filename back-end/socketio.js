@@ -134,6 +134,11 @@ io.on("connection", (socket) => {
     socket.on('disconnect', function () {
     });
 
+    socket.on('clearMapped', async (data)=>{
+      await itemQuerys.clearMatches(data['pid'], data['seller'], data['id'])
+      socket.emit('postMappedItem', {id:"-1", seller:data['seller'], pid:data['pid']})
+    })
+
   })
 })
 

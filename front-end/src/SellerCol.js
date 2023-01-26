@@ -22,12 +22,14 @@ export default function SellerCol({ expressAPI, selectItem, seller, data, pid, s
         let res = await expressAPI.post('/items/checkMappingState', {seller:seller, pid:pid})
         setMappedItem(res.data)
     }
-
+    function clearMapped(){
+        socket.emit('clearMapped', {seller:seller, pid:pid, id:mappedItem})
+    }
     async function scrapeUrl(){
         socket.emit('startScraperItems', {pid:pid, scraper:seller, url:urlTextRef.current.value, mode:3})
     }
     function addTick(){
-         if(mappedItem === "-1"){
+         if(mappedItem == "-1"){
             return <></>
          }else{
             return <img className='mappedItemIcon' src="tickMark.png"></img>
@@ -50,6 +52,7 @@ export default function SellerCol({ expressAPI, selectItem, seller, data, pid, s
                     }
                 </div>
             </div>
+            <div className="button clearButton" onClick={clearMapped}>Clear Selections</div>
             <div className='inputUrlToScrape'>
                 <textarea ref={urlTextRef}></textarea>
                 <div className='button' onClick={scrapeUrl}>SCRAPE URL</div>

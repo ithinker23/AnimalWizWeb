@@ -18,11 +18,13 @@ export default function PriceOptimization({ sellers, storeDB, socket }) {
     }
 
     return (<>
+        <div className="priceOptimPage">
         <div className="button updateMatchesButton" onClick={updatePrices}> UPDATE PRICES </div>
         <div className="PriceOptimizationWindow">
             {matches.map((match,index) => {
                 return <MatchRow match={match} sellers={sellers} storeDB={storeDB} index={index}/>
             })}
+        </div>
         </div>
     </>)
 }
