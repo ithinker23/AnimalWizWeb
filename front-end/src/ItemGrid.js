@@ -15,8 +15,9 @@ export default function ItemGrid({expressAPI,sellers, storeDB, socket}) {
     useEffect(() => {
         socket.on('scraperItems',(reqdata)=>{
             setData((prevData)=>{
-                prevData[reqdata.seller] = { data: reqdata.data, seller: reqdata.seller }
-                return prevData
+                let newData = {...prevData}
+                newData[reqdata.seller] = { data: reqdata.data, seller: reqdata.seller }
+                return newData
             })
         })
 

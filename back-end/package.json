@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "startdev": "set NODE_ENV=development& nodemon app.js ",
-    "startprod": "set NODE_ENV=production& nodemon app.js "
+    "startprod": "NODE_ENV=production nodemon app.js "
   },
   "author": "",
   "license": "ISC",

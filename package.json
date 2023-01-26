@@ -1,0 +1,22 @@
+{
+  "name": "animalwizweb",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "concurrently \"npm --prefix ./back-end run startdev\" \"npm --prefix ./front-end run startdev\" \" cd ./CeleryAPI/ && python celery_server.py \""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ithinker23/AnimalWizWeb.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ithinker23/AnimalWizWeb/issues"
+  },
+  "homepage": "https://github.com/ithinker23/AnimalWizWeb#readme",
+  "dependencies": {
+    "concurrently": "^7.6.0"
+  }
+}

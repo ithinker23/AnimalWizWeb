@@ -1,23 +1,10 @@
 version: "3.8"
 services:
 
-  database:
-    image: postgres:15.1-alpine
-    environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=admin12345
-    ports:
-      - '5433:5432'
-    restart: always
-    networks:
-      animalwiz-backnet:  
-
   express-server:
     build: 
       context: ./back-end
       dockerfile: Dockerfile.dev
-    depends_on:
-      - database
     ports:
       - '5000:5000'
       - '5001:5001'
@@ -25,6 +12,7 @@ services:
     networks:
       animalwiz-backnet:
       animalwiz-frontnet:
+    image: ithinker23/animalwizweb_docker:express-server
 
   celery-api:
     build:
@@ -35,6 +23,7 @@ services:
     restart: always
     networks:
       animalwiz-backnet:
+    image: ithinker23/animalwizweb_docker:celery-api
 
   react-client:
     build: 
@@ -42,12 +31,12 @@ services:
       dockerfile: Dockerfile.dev
     depends_on:
       - express-server
-      - database
     ports:
       - '3000:3000'
     restart: always
     networks:
       animalwiz-frontnet:
+    image: ithinker23/animalwizweb_docker:react-client
 
 networks:
   animalwiz-frontnet:

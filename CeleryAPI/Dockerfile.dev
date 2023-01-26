@@ -5,4 +5,4 @@ WORKDIR /app
 COPY . .
 WORKDIR /app/API
 RUN pip install -r requirements.txt
-CMD ["python","celery_config.py"]
+CMD ["python","celery_server.py"]
