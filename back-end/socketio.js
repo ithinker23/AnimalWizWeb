@@ -56,7 +56,6 @@ io.on("connection", (socket) => {
       client.on('notification', async function (msg) {
 
         let graphData = {}
-        let itemData = {}
 
         seller = msg.payload
 
@@ -84,7 +83,7 @@ io.on("connection", (socket) => {
     socket.on('getPriceOptimData', async (data) => {
 
       let res = await itemQuerys.getPrices(data.sellers)
-
+      
       socket.emit('postPrices', res)
 
       socket.on('startScraper', async (scraperDatas) => {
@@ -105,7 +104,7 @@ io.on("connection", (socket) => {
     })
 
     socket.on('getItemsData', () => {
-      
+
       socket.on('startScraperItems', async (scraperData) => {
         socket.to(KleinID).emit('startScraper', scraperData)
 

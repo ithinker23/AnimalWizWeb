@@ -110,39 +110,35 @@ module.exports = {
 
             let query = "SELECT DISTINCT pid FROM " + config.get('tables.matchesDB')
 
-            client.query(query, (err, pids) => {
+            client.query(query, async (err, pids) => {
                 if (err) reject(err)
                 if (pids.rows.length == 0) resolve(matchList)
-                pids.rows.forEach((pidRow, PIDindex) => {
-                    pid = pidRow.pid
-                    let match = {}
-                    match[config.get('tables.storeDB')] = {}
 
+                for (let PIDindex = 0; PIDindex <= pids.rows.length - 1; PIDindex++) {
+
+                    pid = pids.rows[PIDindex].pid
                     query = "SELECT title,image_src,cost_per_item,variant_price FROM " + config.get('tables.storeDB') + " WHERE pid = " + pid
-                    client.query(query, (err, res) => {
-                        if (err) reject(err)
+                    let res = await client.query(query)
+                    let info = res.rows[0]
+                    let match = {}
+                    match[config.get('tables.storeDB')] = { title: info.title, image_src: info.image_src, costPerItem: info.cost_per_item, variantPrice: info.variant_price }
 
-                        let info = res.rows[0]
-                        match[config.get('tables.storeDB')] = { title: info.title, image_src: info.image_src, costPerItem: info.cost_per_item, variantPrice: info.variant_price }
+                    for (let selIndex = 0; selIndex <= sellers.length - 1; selIndex++) {
+                        seller = sellers[selIndex]
+                        query = "SELECT price,date_stamp FROM " + config.get('tables.pricesDB') + " WHERE pid = " + pid + " AND store_name = '" + seller + "' LIMIT 3"
+                        let res = await client.query(query)
+                        match[seller] = { seller: seller }
+                        match[seller]['price'] = []
+                        match[seller]['price'] = res.rows
+                        if (selIndex >= sellers.length - 1) {
+                            matchList.push(match)
 
-                        sellers.forEach((seller, selIndex) => {
-
-                            query = "SELECT price,date_stamp FROM " + config.get('tables.pricesDB') + " WHERE pid = " + pid + " AND store_name = '" + seller + "' LIMIT 3"
-                            client.query(query, (err, res) => {
-                                if (err) reject(err)
-                                match[seller] = { seller: seller }
-                                match[seller]['price'] = []
-                                match[seller]['price'] = res.rows
-                                if (selIndex >= sellers.length - 1) {
-                                    matchList.push(match)
-                                    if (PIDindex >= pids.rows.length - 1) {
-                                        resolve(matchList)
-                                    }
-                                }
-                            })
-                        })
-                    })
-                })
+                            if (PIDindex >= pids.rows.length - 1) {
+                                resolve(matchList)
+                            }
+                        }
+                    }
+                }
             })
         })
     },
@@ -158,7 +154,7 @@ module.exports = {
                 if (res.rows.length > 0) {
                     resolve(res.rows[0])
                 } else {
-                    resolve({id:"-1"})
+                    resolve({ id: "-1" })
                 }
             })
         })
