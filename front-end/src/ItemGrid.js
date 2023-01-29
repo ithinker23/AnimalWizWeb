@@ -3,7 +3,7 @@ import ItemPrev from './ItemPrev'
 import ItemGridFilter from './ItemGridFilter'
 import SellerCol from './SellerCol'
 
-export default function ItemGrid({expressAPI,sellers, storeDB, socket}) {
+export default function ItemGrid({expressAPI, sellers, storeDB, socket}) {
 
     var initData
     sellers.forEach((seller) => {
@@ -13,6 +13,7 @@ export default function ItemGrid({expressAPI,sellers, storeDB, socket}) {
     const [prevData, setPrevData] = useState({pid:null, images:[], title:"", description:"", price:""})
    
     useEffect(() => {
+        socket.emit('getItemsData')
         socket.on('scraperItems',(reqdata)=>{
             setData((prevData)=>{
                 let newData = {...prevData}

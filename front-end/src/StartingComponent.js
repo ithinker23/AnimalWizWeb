@@ -6,19 +6,14 @@ import Header from './Header'
 import PriceOptimization from './PriceOptimization'
 import io from 'socket.io-client'
 import axios from 'axios'
-import { useEffect } from 'react';
+
+const expressAPI = axios.create({ baseURL: 'http://'+ process.env.REACT_APP_EXPRESS_HOST +':'+ process.env.REACT_APP_EXPRESS_PORT +'' })
+const socket = io.connect('http://'+ process.env.REACT_APP_SOCKET_HOST +':'+ process.env.REACT_APP_SOCKET_PORT +'')
+socket.emit('registeruser')
+const sellers = ["chewy", 'amazon']
+const storeDB = "animal_wiz"
 
 export default function StartingComponent() {
-
-  const expressAPI = axios.create({ baseURL: 'http://'+ process.env.REACT_APP_EXPRESS_HOST +':'+ process.env.REACT_APP_EXPRESS_PORT +'' })
-  const socket = io.connect('http://'+ process.env.REACT_APP_SOCKET_HOST +':'+ process.env.REACT_APP_SOCKET_PORT +'')
-  socket.emit('registeruser')
-  const sellers = ["chewy", 'amazon', 'petsmart']
-  const storeDB = "animal_wiz"
-
-  useEffect(()=>{
-    console.log(process.env.REACT_APP_ENVI)
-  },[])
   
   return (
     <>

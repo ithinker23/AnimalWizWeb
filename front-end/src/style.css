@@ -1,12 +1,12 @@
 body {
-    background-color: #ffffff;
+    background-color: rgb(18, 18, 18);
     font-family: Lato, sans-serif;
     font-style: normal;
-    font-weight: 700;
-    color:#484848;
+    color:rgba(255, 255, 255, 0.7);
     letter-spacing: 0em;
     word-wrap: break-word;
     margin: 0;
+    font-weight: 400;
 }
 
 .flexContent {
@@ -20,7 +20,7 @@ body {
     margin-left: 450px;
     overflow-x: scroll;
     overflow-y: hidden;
-    margin-top:85px;
+    margin-top:100px;
 }
 
 
@@ -30,11 +30,12 @@ body {
     min-width: 400px;
     max-width: 400px;
     padding-right: 10px;
+    margin-left:20px;
 }
 
 
 .sellerItems {
-    height: 80vh;
+    height: 70vh;
     overflow-y: auto;
 }
 
@@ -47,9 +48,9 @@ body {
 
 .item {
     padding: 30px;
-    border: 0.1px solid black;
+    border: 7px solid rgb(39, 39, 39);
     border-radius: 20px;
-    background-color: rgb(255, 255, 255);
+    background-color: rgb(39, 39, 39);
     box-shadow: 0 20px 40px -14px rgb(0 0 0 / 25%);
     font-size: 0.875rem;
     line-height: 1.5;
@@ -73,7 +74,7 @@ body {
 }
 
 .itemTitle {
-    color: #444444;
+    color: #e8e6e6;
     font-size: 1rem;
     font-weight: 400;
     letter-spacing: 2px;
@@ -101,7 +102,6 @@ body {
     margin: 10px 0 0 0;
     padding-bottom: 10px;
     font-size: 20px;
-    background-color: white;
     box-shadow: 0 20px 40px -14px rgba(0, 0, 0, 0.25);
     padding-top: 90px;
 }
@@ -120,7 +120,8 @@ body {
 
 .button {
     background-color: rgb(209, 103, 11);
-    border: 1px solid #cccccc;
+    border: 1px solid #1b1b1b;
+    border-radius:10px;
     color: #f6f6f6;
     padding: 0.5rem;
     height: 25px;
@@ -153,23 +154,21 @@ body {
 ::-webkit-scrollbar-track {
     box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
     border-radius: 10px;
-    background-color: #F5F5F5;
+    background-color: black;
 }
 
 ::-webkit-scrollbar {
     width: 10px;
     height: 7px;
-    background-color: #F5F5F5;
+    background-color: black;
 }
 
 ::-webkit-scrollbar-thumb {
-    border-radius: 10px;
     box-shadow: inset 0 0 6px rgba(0, 0, 0, .3);
     background-color: #555;
 }
 
 .itemPrev {
-    background-color: white;
     width: 400px;
     position: fixed;
     height: 100vh;
@@ -185,7 +184,7 @@ body {
     flex-direction: row;
     justify-content: space-between;
     box-shadow: inset 0 0 6px rgba(0, 0, 0, .3);
-    background-color: white;
+    background-color:black;
     position: fixed;
     z-index:1
 }
@@ -202,7 +201,6 @@ body {
     padding: 30px 10px 0 10px;
     user-select: none;
     cursor: pointer;
-    background-color: white;
     font-size: 17px;
     height:10px;
 }
@@ -226,11 +224,13 @@ body {
 .PriceOptimizationWindow{
     margin:auto;
     width:80%;
-    border:2px solid black;
 }
 .matchRow{
     display: flex;
-    border-bottom: 1px solid black;
+    background-color: rgb(39, 39, 39);
+    margin-bottom:10px;
+    padding:10px;
+    border-radius:20px;
 }
 .match{
     padding:20px 0;
@@ -242,10 +242,15 @@ body {
 }
 .itemPrevImg{
     height:75px;
-    width:75px;
+    width:100px;
     margin-top:10px;
 }
+.itemPrevImg>img{
+    width:90%;
+    height:90%;
+}
 .storeSearchLink{
+    color:white;
     display:block;
     margin:auto;
     width:fit-content;
@@ -270,11 +275,7 @@ body {
 }
 
 .homeNotScrapedItems{
-    height: 500px;
-    width:900px;
-    display: flex;
-    flex-direction: row;
-    margin-top:80px;
+    margin-top:100px;
 }
 .homeInfo{
     display: flex;
@@ -283,24 +284,41 @@ body {
 }
 .homeNotScrapedItem{
     margin: 10px 0 10px 0;
+    text-transform: uppercase;
 }
 .homeNotScrapedItemColumn{
     width:500px;
     margin-left: 50px;
+    background-color: rgb(39, 39, 39);
+    padding:20px;
+    margin-bottom: 50px;
+    border-radius: 10px;
 }
-
+.homeNotScrapedItemSeller{
+    display: flex;
+    flex-direction: row;
+}
 .homeNotScrapedItemsList{
     overflow-y:auto ;
     height:400px;
 }
 .homeNotScrapedItemTitle{
     text-align: center;
+    text-transform: uppercase;
+    margin-bottom: 20px;
     font-size: 20px;
 }
 .inputUrlToScrape{
     height:100px;
 }
-
+.homeNotScrapedItemDoughnut{
+    height:500px;
+    width:500px;
+    margin-left:200px;
+    background-color: rgb(39, 39, 39);
+    padding: 20px;
+    border-radius:20px;
+}
 .inputUrlToScrape > textarea{
     width:98%;
     height:40%;
@@ -323,7 +341,7 @@ body {
 }
 
 .updateMatchesButton{
-    margin:auto;
+    margin:20px auto;
     width:400px;
 }
 .priceOptimPage{

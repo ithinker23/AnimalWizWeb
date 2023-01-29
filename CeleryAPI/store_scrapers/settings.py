@@ -75,7 +75,7 @@ SELENIUM_DRIVER_ARGUMENTS=['headless','Mozilla/5.0 (Windows NT 6.2; Win64; x64; 
 ] # '--headless' if using chrome instead of firefox
 
 DOWNLOADER_MIDDLEWARES = {
-    'store_scrapers.middlewares.StoreScrapersHeaderMiddleware':540,
+    'store_scrapers.middlewares.StoreScrapersHeaderMiddleware':801,
     'scrapy_selenium.SeleniumMiddleware': 800,
     #'store_scrapers.smartproxy_auth.ProxyMiddleware': 100,
     #'scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware': 110,

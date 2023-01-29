@@ -7,9 +7,6 @@ const controller = require('../controllers/itemsController');
 router.route('/getItems')
 .post(controller.getItems);
 
-router.route('/updateMatches')
-.post(controller.updateMatches)
-
 router.route('/getPidList')
 .post(controller.getPidList)
 

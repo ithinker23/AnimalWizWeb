@@ -17,11 +17,10 @@ export default function Item({ seller, item, mappedid, selectItem }) {
         window.open(item.p_url, '_blank');
     }
     useEffect(()=>{
-
-        if(item.id === mappedid){
-            itemRef.current.style = "background-color:#90EE90";
+        if(item.id == mappedid){
+            itemRef.current.style = "border-color:#50C878";
         }else{
-            itemRef.current.style = "background-color:white";
+            itemRef.current.style = "border-color:rgb(39, 39, 39)";
         }
     })
 

@@ -2,7 +2,7 @@ import os
 from configparser import ConfigParser
 import scrapy
 from scrapy_selenium import SeleniumRequest
-from store_scrapers.items import AmazonItem;
+from store_scrapers.items import ScrapedItem;
 from html.parser import HTMLParser
 import psycopg2
 import re
@@ -35,10 +35,10 @@ class AmazonScraperSpider(scrapy.Spider):
         self.base_url = urls[0]
 
         self.search_url = urls[1]
-
         if(self.updateMode == 1):
-            #UPDATE MAPPED ITEMS
-            cur.execute("SELECT amazon FROM " + cfg['tables']['matches'] + " WHERE amazon is not null")
+            #UPDATE MAPPED ITEM
+            print("UPDATING MAPPED ITEMS")
+            cur.execute("SELECT id FROM " + cfg['tables']['matches'] + " WHERE store_name = 'amazon'")
             for id in cur.fetchall():
                 cur.execute("SELECT pid,p_url FROM amazon WHERE id = " + str(id[0]))
                 for res in cur.fetchall():
@@ -88,7 +88,7 @@ class AmazonScraperSpider(scrapy.Spider):
 
     def parse_product(self, response, pid, id):
         print("parsing link")
-        amazon_item = AmazonItem()
+        amazon_item = ScrapedItem()
         amazon_item["pid"] = pid
         amazon_item['url'] = response.url
         amazon_item["id"] = id
@@ -103,7 +103,7 @@ class AmazonScraperSpider(scrapy.Spider):
         amazon_item["price"] = response.xpath(cfg['amazon']['p_pricexpath']).get()
 
         if(amazon_item['price'] == '\n          0% (0%)\n        '):
-            amazon_item['price'] = ''
+            amazon_item['price'] = 'N/A'
     
         amazon_item["images"] = response.xpath(cfg['amazon']['p_imagesxpath']).getall() if response.xpath(cfg['amazon']['p_imagesxpath']).getall() != [] else response.xpath(cfg['amazon']['p_imagesxpathbackup']).getall()
 

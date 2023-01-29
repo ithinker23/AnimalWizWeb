@@ -3,7 +3,7 @@ from configparser import ConfigParser
 import scrapy
 from scrapy_selenium import SeleniumRequest
 from scrapy.utils.response import open_in_browser
-from store_scrapers.items import ChewyItem;
+from store_scrapers.items import ScrapedItem;
 from html.parser import HTMLParser
 import psycopg2
 import re
@@ -19,23 +19,23 @@ class ChewyScraperSpider(scrapy.Spider):
     table_name = 'chewy'
     
     def start_requests(self):
-        self.updateMode = self.mode
+        self.updateMode = 1
         ## Create/Connect to database
         connection = psycopg2.connect(host=cfg["db_connection"]["hostname"], user=cfg['db_connection']['username'], password=cfg['db_connection']['password'], dbname=cfg['db_connection']['database'])
         ## Create cursor, used to execute commands
         cur = connection.cursor()
 
-        cur.execute("SELECT base_url, search_query FROM " + cfg['tables']['urls'] + " WHERE store_name = 'amazon'")
+        cur.execute("SELECT base_url, search_query FROM " + cfg['tables']['urls'] + " WHERE store_name = 'chewy'")
 
         urls = cur.fetchall()[0]
 
         self.base_url = urls[0]
 
         self.search_url = urls[1]
-
         if(self.updateMode == 1):
-            #UPDATE MAPPED ITEMS
-            cur.execute("SELECT chewy FROM " + cfg['tables']['matches'] + " WHERE chewy is not null")
+            #UPDATE MAPPED ITEM
+            print("UPDATING MAPPED ITEMS")
+            cur.execute("SELECT id FROM " + cfg['tables']['matches'] + " WHERE store_name = 'chewy'")
             for id in cur.fetchall():
                 cur.execute("SELECT pid,p_url FROM chewy WHERE id = " + str(id[0]))
                 for res in cur.fetchall():
@@ -48,13 +48,14 @@ class ChewyScraperSpider(scrapy.Spider):
 
             query_results = cur.fetchall()
             for result in query_results:
+                print("new pid: " + str(result[0]))
                 yield scrapy.Request(url=self.base_url + self.search_url + self.sanitizeQuery(result[1]), callback=self.parse, cb_kwargs={"pid":result[0], "id":None})
         else:
             #SCRAPE MANUAL ENTRY
-            yield scrapy.Request(url=self.url, callback=self.parse_product, cb_kwargs={"pid":self.pid, "id":None})
+            yield scrapy.Request(url=self.url, callback=self.parse_product, cb_kwargs={"pid":self.pid, "id":None, 'pages':int(cfg['chewy']['s_pages'])})
  
-    def parse(self, response, pid, id):
-        pagesToScan = int(cfg['chewy']['s_pages'])
+    def parse(self, response, pid, id, pages):
+        pagesToScan = pages
         if (pagesToScan > 0):
             links = response.xpath(cfg['chewy']['s_itemxpath']).getall()
             i_count = 0
@@ -74,13 +75,13 @@ class ChewyScraperSpider(scrapy.Spider):
             pagesToScan -= 1
             next_page = response.xpath(cfg['chewy']['s_nextpagexpath']).get() if response.xpath(cfg['chewy']['s_nextpagexpath']).get() != None  else []
             if(next_page != []):
-                yield response.follow(next_page, callback=self.parse,cb_kwargs={"pid": pid, "pages":pagesToScan} )
+                yield response.follow(next_page, callback=self.parse,cb_kwargs={"pid": pid, "pages":pagesToScan, 'id':id} )
     
     def parse_product(self, response, pid, id):
         if(response.xpath(cfg['chewy']['p_titlexpath']).get() == None):
             open_in_browser(response)
 
-        chewy_item = ChewyItem()
+        chewy_item = ScrapedItem()
         chewy_item["pid"] = pid
         chewy_item['url'] = response.url
         chewy_item["id"] = id

@@ -41,6 +41,12 @@ def start_scrapy_process(data):
     p.start()
     p.join()
 
+@celeryApp.task(name='start_multi_scrapy_process')
+def start_multi_scrapy_process(data):
+    p = Process(target=StartScrapers.run_multi_crawl, kwargs=data)
+    p.start()
+    p.join()
+
 @sio.event
 def registercelery():
     sio.emit('registercelery')
@@ -51,17 +57,18 @@ def handle_scrapers(data):
 
 @sio.on('updatePrices')
 def update_prices(data):
-    for scraper in data.get('scrapers', []):
-        start_scrapy_process.delay({'scraper':scraper, 'mode':1})
+    start_multi_scrapy_process.delay(data)
 
 @sio.on('startTracker')
 def handle_trackers(data):
     updater.delay(data)
 
 if __name__ == "__main__":
-    db_url ='sqla+postgresql://'+ cfg['db_connection']['username'] +':'+ cfg['db_connection']['password'] +'@'+ cfg['db_connection']['hostname'] +'/'+ cfg['db_connection']['database']
-    celeryApp.conf.update(broker_url=db_url)
-        
+    broker_url ='sqla+postgresql://'+ cfg['db_connection']['username'] +':'+ cfg['db_connection']['password'] +'@'+ cfg['db_connection']['hostname'] +'/'+ cfg['db_connection']['database']
+    result_backend='db+postgresql://'+  cfg['db_connection']['username'] +':'+ cfg['db_connection']['password'] +'@'+ cfg['db_connection']['hostname'] +'/'+ cfg['db_connection']['database']
+    celeryApp.conf.update(broker_url=broker_url)
+    celeryApp.conf.update(result_backend=result_backend)
+
     sio_server = 'http://' + cfg['socket_connection']['hostname'] + ':' + cfg['socket_connection']['port']
     sio.connect(sio_server)
     registercelery()
@@ -69,7 +76,6 @@ if __name__ == "__main__":
     argv = [
             'worker',
             '--loglevel=DEBUG',
-            '-P','threads',
-            '-E'
+            '-P','threads'
         ]
     celeryApp.worker_main(argv)

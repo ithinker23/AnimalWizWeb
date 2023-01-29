@@ -14,6 +14,7 @@ const io = new Server(server, {
 })
 
 server.listen(5001, () => {
+  console.log('socketio listening on port 5001')
 })
 
 let KleinID
@@ -25,34 +26,32 @@ io.on("connection", (socket) => {
     console.log("celery connected")
   })
 
-
   socket.on('registeruser', () => {
     console.log("user connected")
-    socket.on('getHomeData', async (sellers) => {
 
+    socket.on('getSellerHomeData', async (seller) => {
       let graphData = {}
-      let itemData = {}
-      sellers.forEach(async (seller, index) => {
-        itemData[seller] = {}
-        graphData[seller] = {}
 
-        let scraped = await itemQuerys.getscrapedcount(seller)
-        graphData[seller]['foundPids'] = scraped
+      let scraped = await itemQuerys.getscrapedcount(seller)
+      graphData['foundPids'] = scraped
 
-        let nonscraped = await itemQuerys.getnonscrapedcount(seller)
-        graphData[seller]['nullPids'] = nonscraped
+      let nonscraped = await itemQuerys.getnonscrapedcount(seller)
+      graphData['nullPids'] = nonscraped
 
-        let mapped = await itemQuerys.getmappedcount(seller)
-        graphData[seller]['mappedPids'] = mapped
+      let mapped = await itemQuerys.getmappedcount(seller)
+      graphData['mappedPids'] = mapped
 
-        let nullItems = await itemQuerys.getNullItems(seller)
-        itemData[seller]["nullItems"] = nullItems
+      let nullItems = await itemQuerys.getNullItems(seller)
 
-        if (index >= sellers.length - 1) {
-          socket.emit('homeData', { graphData: graphData, itemData: itemData })
-        }
+      socket.emit('updateSellerHomeInfo', { graphData: graphData, itemData: nullItems, seller: seller })
 
-      });
+    });
+
+    socket.on('getHomeData', () => {
+      console.log("home connected")
+      socket.on('startScraper', async (scraperData) => {
+        socket.to(KleinID).emit('startScraper', scraperData)
+      })
 
       client.on('notification', async function (msg) {
 
@@ -71,9 +70,8 @@ io.on("connection", (socket) => {
         graphData['mappedPids'] = mapped
 
         let nullItems = await itemQuerys.getNullItems(seller)
-        itemData['nullItems'] = nullItems
 
-        socket.emit('homeDataUpdate', { graphData: graphData, itemData: itemData, seller: seller })
+        socket.emit('updateSellerHomeInfo', { graphData: graphData, itemData: nullItems, seller: seller })
       })
 
       client.query('LISTEN items_notif')
@@ -83,41 +81,20 @@ io.on("connection", (socket) => {
       })
     })
 
-    socket.on('startScraperPriceOptim', async (scraperData) => {
-      socket.to(KleinID).emit('updatePrices', scraperData)
+    socket.on('getPriceOptimData', async (data) => {
 
-    })
+      let res = await itemQuerys.getPrices(data.sellers)
 
-    socket.on('startScraper', async (scraperData) => {
-      socket.to(KleinID).emit('startScraper', scraperData)
-    })
+      socket.emit('postPrices', res)
 
-    socket.on('startScraperItems', async (scraperData) => {
-
-      socket.to(KleinID).emit('startScraper', scraperData)
-
-      client.query('LISTEN items_notif')
-
-      socket.on('disconnect', () => {
-        client.query('UNLISTEN items_notif')
+      socket.on('startScraper', async (scraperDatas) => {
+        socket.to(KleinID).emit('updatePrices', scraperDatas)
       })
-      
-      client.on('notification', async function (msg) {
-        let res = await itemQuerys.getItems(scraperData.scraper, scraperData.pid, "similarity")
-
-        socket.emit('scraperItems', { data: res.rows, seller: scraperData.scraper })
-      })
-    })
-
-    socket.on('getMatches', async (data) => {
-      let res = await itemQuerys.getMatches(data.sellers, data.store_name)
-
-      socket.emit('postMatches', res)
 
       client.on('notification', async (msg) => {
-        res = await itemQuerys.getMatches(data.sellers, data.store_name)
+        res = await itemQuerys.getPrices(data.sellers)
 
-        socket.emit('postMatches', res)
+        socket.emit('postPrices', res)
       })
 
       client.query('LISTEN price_notif')
@@ -126,19 +103,37 @@ io.on("connection", (socket) => {
         client.query('UNLISTEN price_notif')
       })
     })
-    socket.on('mapItem', async (data) => {
-      let res = await itemQuerys.updateMatches(data['pid'], data['id'], data['seller'])
 
-      socket.emit('postMappedItem', res)
+    socket.on('getItemsData', () => {
+      
+      socket.on('startScraperItems', async (scraperData) => {
+        socket.to(KleinID).emit('startScraper', scraperData)
+
+        client.on('notification', async function (msg) {
+          let res = await itemQuerys.getItems(scraperData.scraper, scraperData.pid, "similarity")
+          socket.emit('scraperItems', { data: res.rows, seller: scraperData.scraper })
+        })
+      })
+
+      socket.on('mapItem', async (data) => {
+        let res = await itemQuerys.updateMappings(data['pid'], data['id'], data['seller'])
+        socket.emit('postMappedItem', res)
+      })
+
+      socket.on('clearMapped', async (data) => {
+        await itemQuerys.clearMappings(data['pid'], data['seller'], data['id'])
+        socket.emit('postMappedItem', { id: "-1", seller: data['seller'], pid: data['pid'] })
+      })
+
+      client.query('LISTEN items_notif')
+
+      socket.on('disconnect', () => {
+        client.query('UNLISTEN items_notif')
+      })
     })
-    socket.on('disconnect', function () {
-    });
-
-    socket.on('clearMapped', async (data)=>{
-      await itemQuerys.clearMatches(data['pid'], data['seller'], data['id'])
-      socket.emit('postMappedItem', {id:"-1", seller:data['seller'], pid:data['pid']})
-    })
-
+  })
+  socket.on('disconnect', () => {
+    console.log('user disconnected')
   })
 })
 

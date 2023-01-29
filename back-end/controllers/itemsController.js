@@ -6,14 +6,6 @@ module.exports = {
         res.send(items)
     },
 
-    updateMatches: async (req, res) => {
-        try {
-            await itemsQuerys.updateMatches()
-            res.sendStatus(200)
-        } catch (err) {
-            res.sendStatus(400)
-        }
-    },
     getPidList: async (req,res)=>{
         try {
             let result = await itemsQuerys.getPidList(req.body.table)

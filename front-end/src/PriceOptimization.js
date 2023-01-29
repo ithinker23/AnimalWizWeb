@@ -1,28 +1,29 @@
 import { useEffect, useState } from "react"
-import MatchRow from './MatchRow'
+import PriceRow from './PriceRow'
 
 export default function PriceOptimization({ sellers, storeDB, socket }) {
 
-    const [matches, setMatches] = useState([])
+    const [prices, setPrices] = useState([])
 
     useEffect(() => {
-        socket.emit('getMatches', {sellers:sellers, store_name:storeDB})
+        socket.emit('getPriceOptimData', {sellers:sellers})
 
-        socket.on('postMatches', (data)=>{
-            setMatches(data)
+        socket.on('postPrices', (data)=>{
+            console.log(data)
+            setPrices(data)
         })
     }, [socket])
 
-    function updatePrices(){
-        socket.emit('startScraperPriceOptim', {scrapers:sellers})
+    function scrapePrices(){
+        socket.emit('startScraper', {scraperDatas: sellers.map(seller=>{return {scraper:seller, mode:1}})})
     }
 
     return (<>
         <div className="priceOptimPage">
-        <div className="button updateMatchesButton" onClick={updatePrices}> UPDATE PRICES </div>
+        <div className="button updateMatchesButton" onClick={scrapePrices}> UPDATE PRICES </div>
         <div className="PriceOptimizationWindow">
-            {matches.map((match,index) => {
-                return <MatchRow match={match} sellers={sellers} storeDB={storeDB} index={index}/>
+            {prices.map((price,index) => {
+                return <PriceRow price={price} sellers={sellers} storeDB={storeDB} index={index}/>
             })}
         </div>
         </div>

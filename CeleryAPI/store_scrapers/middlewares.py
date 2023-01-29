@@ -15,6 +15,7 @@ class StoreScrapersHeaderMiddleware:
         user_agent = random.choice(USER_AGENT_LIST)
         if user_agent:
             request.headers['User-Agent'] = user_agent
+            #print(spider.table_name)
             #print("[REQUEST HEADERS]: " + str(request.headers))
 
 class StoreScrapersSpiderMiddleware:

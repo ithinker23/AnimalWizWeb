@@ -40,47 +40,48 @@ class Pipeline:
         """)
 
         try:
-            print(spider.table_name + " pipeline: " + item['title'])
             if(item['id'] != None):
-                self.cur.execute("""select id from """ + spider.table_name + """ where id = '{id}' """.format(id=item['id']))
-                id = self.cur.fetchone()
-            else:
-                id = None
-            if(id == None):
-                ## Define insert statement
-                self.cur.execute(""" insert into """ + spider.table_name + """ (pid, title, images, p_url, description) values (%s,%s,%s,%s,%s) """,(                  
-                    item["pid"],
-                    item["title"],          
-                    item["images"],
-                    item['url'],
-                    item["description"]))
-
-                self.cur.execute(" SELECT id FROM " + spider.table_name + " where pid = %s and title = %s", (
-                    item['pid'],
-                    item['title']
-                ))
-
-                id = self.cur.fetchall()[0][0]
-
-                self.cur.execute("""insert into """ + cfg['tables']['price_history'] + """(store_name, pid, id, price) VALUES ('""" + spider.table_name + """',%s,%s,%s)""", (                  
-                        item['pid'],
-                        id,
-                        item['price']
-                ))
-
-            else:
                 self.cur.execute("""select price from """ + cfg['tables']['price_history'] + """ where pid = %s and id=%s and store_name='""" + spider.table_name + """' order by time_stamp """, (
                     item['pid'],
                     item['id']
                 ))
 
-                last_price = self.cur.fetchone()[0]
+                last_price = self.cur.fetchone()
+                if(last_price != None):
+                    if(last_price[0] != item['price']):
+                        self.cur.execute("""insert into """ + cfg['tables']['price_history'] + """(store_name, pid, id, price) VALUES ('""" + spider.table_name + """',%s,%s,%s)""", (                  
+                                item['pid'],
+                                item['id'],
+                                item['price']
+                    ))
 
-                if(last_price != item['price']):
-                    self.cur.execute("""insert into """ + cfg['tables']['price_history'] + """(store_name, pid, id, price) VALUES ('""" + spider.table_name + """',%s,%s,%s)""", (                  
-                            item['pid'],
-                            item['id'],
-                            item['price']
+            else:
+                self.cur.execute("select p_url from " +  spider.table_name + " where p_url = '" + item['url'] + "'")
+                url = self.cur.fetchone()
+
+                if(url == None):
+                    ## Define insert statement
+                    self.cur.execute(""" insert into """ + spider.table_name + """ (pid, title, images, p_url, description) values (%s,%s,%s,%s,%s) """,(                  
+                        item["pid"],
+                        item["title"],          
+                        item["images"],
+                        item['url'],
+                        item["description"]))
+
+                    self.cur.execute("SELECT id FROM " + spider.table_name + " WHERE p_url = '"+item['url']+"'")
+                    id = self.cur.fetchone()
+                    self.cur.execute("""select price from """ + cfg['tables']['price_history'] + """ where pid = %s and id=%s and store_name='""" + spider.table_name + """' order by time_stamp """, (
+                    item['pid'],
+                    id
+                     ))
+
+                    last_price = self.cur.fetchone()
+                    if(last_price != None):
+                        if(last_price[0] != item['price']):
+                            self.cur.execute("""insert into """ + cfg['tables']['price_history'] + """(store_name, pid, id, price) VALUES ('""" + spider.table_name + """',%s,%s,%s)""", (                  
+                                item['pid'],
+                                id,
+                                item['price']
                     ))
 
         except Exception as error:

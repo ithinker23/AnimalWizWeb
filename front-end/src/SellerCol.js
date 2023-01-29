@@ -4,6 +4,7 @@ import Item from './Item'
 export default function SellerCol({ expressAPI, selectItem, seller, data, pid, socket}) {
 
     const [mappedItem, setMappedItem] = useState()
+    const [scraperState,setScraperState] = useState(false)
     const urlTextRef = useRef()
     
     useEffect(()=>{
@@ -12,15 +13,19 @@ export default function SellerCol({ expressAPI, selectItem, seller, data, pid, s
 
     useEffect(()=>{
         socket.on('postMappedItem', (data) => {
-            if(data['seller'] === seller){
+            if(data['seller'] == seller){
             setMappedItem(data['id'])
         }
+        })
+        socket.emit('getScraperState',(seller))
+        socket.on('scraperState', (state)=>{
+            setScraperState(state)
         })
     },[socket])
 
     async function checkMappingState(){
         let res = await expressAPI.post('/items/checkMappingState', {seller:seller, pid:pid})
-        setMappedItem(res.data)
+        setMappedItem(res.data.id)
     }
     function clearMapped(){
         socket.emit('clearMapped', {seller:seller, pid:pid, id:mappedItem})
