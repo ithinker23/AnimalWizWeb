@@ -1,51 +1,46 @@
 import React, { useEffect, useState, useRef } from 'react'
 import Item from './Item'
 
-export default function SellerCol({ expressAPI, selectItem, seller, data, pid, socket}) {
+export default function SellerCol({ expressAPI, selectItem, seller, data, pid, socket }) {
 
     const [mappedItem, setMappedItem] = useState()
-    const [scraperState,setScraperState] = useState(false)
     const urlTextRef = useRef()
-    
-    useEffect(()=>{
+
+    useEffect(() => {
         checkMappingState()
-    },[pid])
+    }, [pid])
 
-    useEffect(()=>{
+    useEffect(() => {
         socket.on('postMappedItem', (data) => {
-            if(data['seller'] == seller){
-            setMappedItem(data['id'])
-        }
+            if (data['seller'] == seller) {
+                setMappedItem(data['id'])
+            }
         })
-        socket.emit('getScraperState',(seller))
-        socket.on('scraperState', (state)=>{
-            setScraperState(state)
-        })
-    },[socket])
+    }, [socket])
 
-    async function checkMappingState(){
-        let res = await expressAPI.post('/items/checkMappingState', {seller:seller, pid:pid})
+    async function checkMappingState() {
+        let res = await expressAPI.post('/items/checkMappingState', { seller: seller, pid: pid })
         setMappedItem(res.data.id)
     }
-    function clearMapped(){
-        socket.emit('clearMapped', {seller:seller, pid:pid, id:mappedItem})
+    function clearMapped() {
+        socket.emit('clearMapped', { seller: seller, pid: pid, id: mappedItem })
     }
-    async function scrapeUrl(){
-        socket.emit('startScraperItems', {pid:pid, scraper:seller, url:urlTextRef.current.value, mode:3})
+    async function scrapeUrl() {
+        socket.emit('startScraperItems', { pid: pid, scraper: seller, url: urlTextRef.current.value, mode: 3 })
     }
-    function addTick(){
-         if(mappedItem == "-1"){
+    function addTick() {
+        if (mappedItem == "-1") {
             return <></>
-         }else{
+        } else {
             return <img className='mappedItemIcon' src="tickMark.png"></img>
-         }
+        }
     }
-    
+
     return (
         <div className='sellerCol'>
             <div className='itemsCol'>
                 <div className='sellerTitleWrapper'>
-                <div className='sellerTitle'>{seller}</div> {addTick()}
+                    <div className='sellerTitle'>{seller}</div> {addTick()}
                 </div>
                 <div className='sellerItems'>
                     {

@@ -6,6 +6,7 @@ import Header from './Header'
 import PriceOptimization from './PriceOptimization'
 import io from 'socket.io-client'
 import axios from 'axios'
+import NotificationPanel from './NotificationPanel'
 
 const expressAPI = axios.create({ baseURL: 'http://'+ process.env.REACT_APP_EXPRESS_HOST +':'+ process.env.REACT_APP_EXPRESS_PORT +'' })
 const socket = io.connect('http://'+ process.env.REACT_APP_SOCKET_HOST +':'+ process.env.REACT_APP_SOCKET_PORT +'')
@@ -14,7 +15,7 @@ const sellers = ["chewy", 'amazon']
 const storeDB = "animal_wiz"
 
 export default function StartingComponent() {
-  
+
   return (
     <>
       <Header />
@@ -25,6 +26,7 @@ export default function StartingComponent() {
           <Route path="/priceOptimization" element={<PriceOptimization socket={socket} sellers={sellers} storeDB={storeDB} />} />
         </Routes>
       </Router>
+      <NotificationPanel socket={socket}/>
     </>
   )
 }

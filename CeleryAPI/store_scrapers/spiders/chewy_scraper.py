@@ -19,7 +19,7 @@ class ChewyScraperSpider(scrapy.Spider):
     table_name = 'chewy'
     
     def start_requests(self):
-        self.updateMode = 1
+        self.updateMode = self.mode
         ## Create/Connect to database
         connection = psycopg2.connect(host=cfg["db_connection"]["hostname"], user=cfg['db_connection']['username'], password=cfg['db_connection']['password'], dbname=cfg['db_connection']['database'])
         ## Create cursor, used to execute commands
@@ -34,7 +34,6 @@ class ChewyScraperSpider(scrapy.Spider):
         self.search_url = urls[1]
         if(self.updateMode == 1):
             #UPDATE MAPPED ITEM
-            print("UPDATING MAPPED ITEMS")
             cur.execute("SELECT id FROM " + cfg['tables']['matches'] + " WHERE store_name = 'chewy'")
             for id in cur.fetchall():
                 cur.execute("SELECT pid,p_url FROM chewy WHERE id = " + str(id[0]))
@@ -48,8 +47,7 @@ class ChewyScraperSpider(scrapy.Spider):
 
             query_results = cur.fetchall()
             for result in query_results:
-                print("new pid: " + str(result[0]))
-                yield scrapy.Request(url=self.base_url + self.search_url + self.sanitizeQuery(result[1]), callback=self.parse, cb_kwargs={"pid":result[0], "id":None})
+                yield scrapy.Request(url=self.base_url + self.search_url + self.sanitizeQuery(result[1]), callback=self.parse, cb_kwargs={"pid":result[0], "id":None, 'pages':int(cfg['chewy']['s_pages'])})
         else:
             #SCRAPE MANUAL ENTRY
             yield scrapy.Request(url=self.url, callback=self.parse_product, cb_kwargs={"pid":self.pid, "id":None, 'pages':int(cfg['chewy']['s_pages'])})

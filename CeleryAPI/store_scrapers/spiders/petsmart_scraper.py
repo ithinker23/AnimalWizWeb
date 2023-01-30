@@ -36,7 +36,6 @@ class PetSmartScraperSpider(scrapy.Spider):
         self.search_url = urls[1]
         if(self.updateMode == 1):
             #UPDATE MAPPED ITEM
-            print("UPDATING MAPPED ITEMS")
             cur.execute("SELECT id FROM " + cfg['tables']['matches'] + " WHERE store_name = 'petsmart'")
             for id in cur.fetchall():
                 cur.execute("SELECT pid,p_url FROM petsmart WHERE id = " + str(id[0]))
@@ -50,7 +49,6 @@ class PetSmartScraperSpider(scrapy.Spider):
 
             query_results = cur.fetchall()
             for result in query_results:
-                print("new pid: " + str(result[0]))
                 yield scrapy.Request(url=self.base_url + self.search_url + self.sanitizeQuery(result[1]), callback=self.parse, cb_kwargs={"pid":result[0], "id":None, 'pages':int(cfg['petsmart']['s_pages'])})
         else:
             #SCRAPE MANUAL ENTRY

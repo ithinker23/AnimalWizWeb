@@ -7,6 +7,10 @@ export default function Home({ sellers, socket }) {
     socket.emit('startScraper', {scraper:seller, mode:2})
   }
 
+  function stopScraperHome(seller){
+    socket.emit('stopScraper', {scraper:seller})
+  }
+  
   useEffect(()=>{
     socket.emit('getHomeData')
   },[socket])
@@ -16,7 +20,7 @@ export default function Home({ sellers, socket }) {
        <div className='homeNotScrapedItems'>
         {
           sellers.map((seller) => {
-            return <SellerHomeInfo socket={socket} startScraperHome={startScraperHome} seller={seller}/> 
+            return <SellerHomeInfo socket={socket} startScraperHome={startScraperHome} stopScraperHome={stopScraperHome} seller={seller}/> 
           })  
         }
         

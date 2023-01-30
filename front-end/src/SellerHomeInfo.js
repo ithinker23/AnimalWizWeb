@@ -3,12 +3,11 @@ import { useState } from 'react'
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import { Doughnut } from 'react-chartjs-2';
 
-export default function NotScrapedItemsList({ socket, seller, startScraperHome }) {
+export default function NotScrapedItemsList({ socket, seller, startScraperHome, stopScraperHome }) {
     const showPerPage = 10
     const [page, setPage] = useState(1)
     const [items, setItems] = useState([])
     const [graphData, setGraphData] = useState({foundPids:0, nullPids:0, mappedPids:0})
-
 
     ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -38,6 +37,7 @@ export default function NotScrapedItemsList({ socket, seller, startScraperHome }
             },
         ],
     };
+
     useEffect(() => {
         socket.emit('getSellerHomeData', seller)
 
@@ -48,7 +48,6 @@ export default function NotScrapedItemsList({ socket, seller, startScraperHome }
                 setGraphData(data['graphData'])
             }
         })
-
     }, [socket])
 
     return (
@@ -70,6 +69,7 @@ export default function NotScrapedItemsList({ socket, seller, startScraperHome }
                     <div className='navButton button' onClick={() => { setPage((page) => { if (page <= (items.length) / showPerPage) { return page + 1 } else { return page } }) }}>Next</div>
                 </div>
                 <div className='button' onClick={() => { startScraperHome(seller) }}> START {seller} SCRAPER</div>
+                <div className='button' onClick={() => { stopScraperHome(seller) }}> STOP {seller} SCRAPER</div>
             </div>
             <div className='homeNotScrapedItemDoughnut'>
                 <Doughnut data={data} />

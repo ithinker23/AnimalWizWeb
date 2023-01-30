@@ -37,7 +37,6 @@ class AmazonScraperSpider(scrapy.Spider):
         self.search_url = urls[1]
         if(self.updateMode == 1):
             #UPDATE MAPPED ITEM
-            print("UPDATING MAPPED ITEMS")
             cur.execute("SELECT id FROM " + cfg['tables']['matches'] + " WHERE store_name = 'amazon'")
             for id in cur.fetchall():
                 cur.execute("SELECT pid,p_url FROM amazon WHERE id = " + str(id[0]))
@@ -51,14 +50,13 @@ class AmazonScraperSpider(scrapy.Spider):
 
             query_results = cur.fetchall()
             for result in query_results:
-                print("new pid: " + str(result[0]))
-                yield scrapy.Request(url=self.base_url + self.search_url + self.sanitizeQuery(result[1]), callback=self.parse, cb_kwargs={"pid":result[0], "id":None})
+                yield scrapy.Request(url=self.base_url + self.search_url + self.sanitizeQuery(result[1]), callback=self.parse, cb_kwargs={"pid":result[0], "id":None,'pages':int(cfg['amazon']['s_pages'])})
         else:
             #SCRAPE MANUAL ENTRY
             yield scrapy.Request(url=self.url, callback=self.parse_product, cb_kwargs={"pid":self.pid, "id":None})
 
-    def parse(self, response, pid, id):
-        pagesToScan = int(cfg['amazon']['s_pages'])
+    def parse(self, response, pid, id, pages):
+        pagesToScan = pages
 
         links=response.xpath(cfg['amazon']['s_itemxpath']).getall()
         sel_script="document.querySelectorAll('.a-spacing-small.item.imageThumbnail.a-declarative').forEach((element)=>{element.click()});"
@@ -82,12 +80,11 @@ class AmazonScraperSpider(scrapy.Spider):
         pagesToScan -= 1
         next_page = response.xpath(cfg['amazon']['s_nextpagexpath']).get() if response.xpath(cfg['amazon']['s_nextpagexpath']).get() != None  else []
         if(next_page != [] and pagesToScan > 0):
-            yield response.follow(next_page, callback=self.parse, cb_kwargs={"pid":pid, "pages":pagesToScan})
+            yield response.follow(next_page, callback=self.parse, cb_kwargs={"pid":pid, "pages":pagesToScan, 'id':id})
                 
             
 
     def parse_product(self, response, pid, id):
-        print("parsing link")
         amazon_item = ScrapedItem()
         amazon_item["pid"] = pid
         amazon_item['url'] = response.url

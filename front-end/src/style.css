@@ -347,3 +347,45 @@ body {
 .priceOptimPage{
     padding-top:80px;
 }
+.notificationPanel{
+    width:350px;
+    height:400px;
+    z-index: 1;
+    position: fixed;
+    bottom:0px;
+    pointer-events: none;
+    right:0;
+    display: flex;
+    flex-direction: column-reverse;
+}
+.notif{
+    background-color: green;
+    height:fit-content;
+    margin:10px 0;
+    border-radius: 10px;
+    padding:10px;
+    animation: notifAnim ease 4s;
+    opacity: 0%;
+}
+
+.notifTitle{
+    text-align: center;
+    font-size: 19px;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+}
+
+.notifDesc{
+    text-align:center;
+}
+@keyframes notifAnim {
+    0%{
+        opacity: 100%;
+    }
+    50%{
+        opacity: 100%;
+    }
+    100%{
+        opacity: 0%;
+    }
+}

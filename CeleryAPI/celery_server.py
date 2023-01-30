@@ -6,6 +6,8 @@ from scraper_controller import StartScrapers
 import datetime as dt
 import time
 import math
+from celery import Task
+from celery.exceptions import SoftTimeLimitExceeded
 
 file = 'config.ini'
 cfg = ConfigParser()
@@ -16,36 +18,48 @@ celeryApp = celery.Celery()
 
 #----------TASKS AND EVENTS--------------
 
-def update_mapped_items(hour):
-
-    while True:
-        hour_of_day = dt.datetime.now().second % 10
-
-        if(hour_of_day == hour):
-            pass
-            # for scraper in cfg['scrapers']['names']:
-            #     start_scrapy_process({'scraper':scraper, 'mode':1})
+class CallbackTask(Task):
+    def on_success(self, retval, task_id, args, kwargs):
+        updScraperStatus({'returnVal':retval, 'task_id':task_id })
         
-        time.sleep(1)
+    def on_failure(self, exc, task_id, args, kwargs, einfo):
+        updScraperStatus({'returnVal':exc, 'task_id':task_id })
 
+# def update_mapped_items(hour):
 
-@celeryApp.task(name='updater')
-def updater(hour):
-    p = Process(target=update_mapped_items, kwargs={'hour':hour})
-    p.start()
-    p.join()
+#     while True:
+#         hour_of_day = dt.datetime.now().second % 10
 
-@celeryApp.task(name='start_scrapy_process')
+#         if(hour_of_day == hour):
+#             pass
+#             # for scraper in cfg['scrapers']['names']:
+#             #     start_scrapy_process({'scraper':scraper, 'mode':1})
+        
+#         time.sleep(1)
+
+# @celeryApp.task(name='updater')
+# def updater(hour):
+#     p = Process(target=update_mapped_items, kwargs={'hour':hour})
+#     p.start()
+#     p.join()
+
+@celeryApp.task(name='start_scrapy_process', base=CallbackTask)
 def start_scrapy_process(data):
-    p = Process(target=StartScrapers.run_crawl, kwargs=data)
-    p.start()
-    p.join()
+    try:
+        p = Process(target=StartScrapers.run_crawl, kwargs=data)
+        p.start()
+        p.join()
+    except SoftTimeLimitExceeded:
+        raise SoftTimeLimitExceeded
 
-@celeryApp.task(name='start_multi_scrapy_process')
+@celeryApp.task(name='start_multi_scrapy_process',base=CallbackTask)
 def start_multi_scrapy_process(data):
-    p = Process(target=StartScrapers.run_multi_crawl, kwargs=data)
-    p.start()
-    p.join()
+    try:
+        p = Process(target=StartScrapers.run_multi_crawl, kwargs={'scraperDatas':data})
+        p.start()
+        p.join()
+    except SoftTimeLimitExceeded:
+        raise SoftTimeLimitExceeded
 
 @sio.event
 def registercelery():
@@ -53,15 +67,28 @@ def registercelery():
 
 @sio.on('startScraper')
 def handle_scrapers(data):
-    start_scrapy_process.delay(data)
+    task = start_scrapy_process.apply_async(kwargs={'data':data})
+    sio.emit('celeryScraperID',{'scraper':data.get('scraper'), "id":task.id})
 
 @sio.on('updatePrices')
 def update_prices(data):
-    start_multi_scrapy_process.delay(data)
+    task = start_multi_scrapy_process.apply_async(kwargs={'data':data})
+    sio.emit('celeryScraperID', {'scraper':'priceOptimTask', 'id':task.id})
 
-@sio.on('startTracker')
-def handle_trackers(data):
-    updater.delay(data)
+@sio.event()
+def updScraperStatus(data):
+    sio.emit('updScraperStatus', data)
+
+@sio.on('stopScraper')
+def stopScraper(id):
+    celeryApp.control.revoke(id, terminate=True, signal='SIGKILL')
+
+
+# @sio.on('startTracker')
+# def handle_trackers(data):
+#     updater.delay(data)
+
+# from celery import Task
 
 if __name__ == "__main__":
     broker_url ='sqla+postgresql://'+ cfg['db_connection']['username'] +':'+ cfg['db_connection']['password'] +'@'+ cfg['db_connection']['hostname'] +'/'+ cfg['db_connection']['database']
