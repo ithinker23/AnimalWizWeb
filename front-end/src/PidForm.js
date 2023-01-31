@@ -1,9 +1,10 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 
 export default function PidForm({ expressAPI, initData, setData, sellers, storeDB, setPrevData }) {
 
   const [pid, setPid] = useState(null)
   const [pidList, setPidList] = useState([])
+  const pidInputRef = useRef()
 
   useEffect(() => {
     getItems()
@@ -44,11 +45,28 @@ export default function PidForm({ expressAPI, initData, setData, sellers, storeD
     }
   }
 
+  function changePid(){
+    if(parseInt(pidInputRef.current.value) >= pidList[pidList.length-1]){
+      setPid(pidList[pidList.length-1])
+      return
+    }
+    for(let i = 0; i < pidList.length; i++){
+      if(pidList[i] >= parseInt(pidInputRef.current.value)){
+        setPid(pidList[i])
+        break
+      }
+    }
+  }
+
   return (<>
     <div className='nav'>
       <div className="navButton button" onClick={() => { setPid(pidList[pidList.indexOf(pid) - 1] ? pidList[pidList.indexOf(pid) - 1] : pidList[pidList.indexOf(pid)]) }}>Prev</div>
       <div className='navPrev'>{pid}</div>
       <div className='navButton button' onClick={() => { setPid(pidList[pidList.indexOf(pid) + 1] ? pidList[pidList.indexOf(pid) + 1] : pidList[pidList.indexOf(pid)]) }}>Next</div>
+    </div>
+    <div className='pidSelection'>
+        <input ref={pidInputRef} className='pidInput' type="number"></input>
+        <div className='pidInputSubmit button' onClick={changePid}>Go To Nearest Pid</div>
     </div>
   </>)
 }

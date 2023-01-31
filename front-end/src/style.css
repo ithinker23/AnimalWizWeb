@@ -389,3 +389,14 @@ body {
         opacity: 0%;
     }
 }
+.pidSelection{
+    width:150;
+    margin:auto;
+    text-align: center;
+    margin-bottom: 20px;
+
+}
+.pidInput{
+    width:150px;
+    margin-bottom: 10px;
+}
