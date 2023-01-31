@@ -99,7 +99,7 @@ class AmazonScraperSpider(scrapy.Spider):
 
         amazon_item["price"] = response.xpath(cfg['amazon']['p_pricexpath']).get()
 
-        if(amazon_item['price'] == '\n          0% (0%)\n        '):
+        if(amazon_item['price'] == '\n          0% (0%)\n        ' or amazon_item['price'] == None):
             amazon_item['price'] = 'N/A'
     
         amazon_item["images"] = response.xpath(cfg['amazon']['p_imagesxpath']).getall() if response.xpath(cfg['amazon']['p_imagesxpath']).getall() != [] else response.xpath(cfg['amazon']['p_imagesxpathbackup']).getall()

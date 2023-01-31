@@ -37,6 +37,8 @@ io.on("connection", (socket) => {
       for (let taskIndex = 0; taskIndex <= Object.keys(activeTasks).length - 1; taskIndex++) {
         if (activeTasks[Object.keys(activeTasks)[taskIndex]]['taskID'] == data['task_id']) {
           delete activeTasks[Object.keys(activeTasks)[taskIndex]]
+          console.log('deleting task')
+          socket.broadcast.emit('displayNotif', { scraper: 'idk', msg: "Scraper Has Successfully Finished", Title: "Scraper Finished", isError: false })
         }
       }
       console.log(activeTasks)
@@ -68,10 +70,10 @@ io.on("connection", (socket) => {
       let id = activeTasks[data.scraper].taskID
       if (id != null) {
         socket.to(KleinID).emit('stopScraper', id)
-        socket.emit('displayScraperStatus', { scraper: data.scraper, msg: data.scraper + " Scraper Has Been Stopped", Title: "Scraper Stopped", isError: false })
+        socket.emit('displayNotif', { scraper: data.scraper, msg: data.scraper + " Scraper Has Been Stopped", Title: "Scraper Stopped", isError: false })
 
       } else {
-        socket.emit('displayScraperStatus', { scraper: data.scraper, msg: data.scraper + " Scraper Is Not Running", Title: "Scraper Stop Failed", isError: true })
+        socket.emit('displayNotif', { scraper: data.scraper, msg: data.scraper + " Scraper Is Not Running", Title: "Scraper Stop Failed", isError: true })
 
       }
     })
@@ -80,9 +82,9 @@ io.on("connection", (socket) => {
       console.log("home connected")
       socket.on('startScraper', async (scraperData) => {
         if (Object.hasOwn(activeTasks, scraperData.scraper)) {
-          socket.emit('displayScraperStatus', { scraper: scraperData.scraper, msg: scraperData.scraper + " Scraper Has Already Been Started", Title: "Scraper Failed", isError: true })
+          socket.emit('displayNotif', { scraper: scraperData.scraper, msg: scraperData.scraper + " Scraper Has Already Been Started", Title: "Scraper Failed", isError: true })
         } else {
-          socket.emit('displayScraperStatus', { scraper: scraperData.scraper, msg: scraperData.scraper + " Scraper Has Successfully Started", Title: "Scraper Running", isError: false })
+          socket.emit('displayNotif', { scraper: scraperData.scraper, msg: scraperData.scraper + " Scraper Has Successfully Started", Title: "Scraper Running", isError: false })
           activeTasks[scraperData.scraper] = { taskID: null }
           socket.to(KleinID).emit('startScraper', scraperData)
         }
@@ -115,26 +117,28 @@ io.on("connection", (socket) => {
       })
     })
 
-    socket.on('getPriceOptimData', async (data) => {
-
-      let res = await itemQuerys.getPrices(data.sellers)
+    socket.on('getPriceOptimData', async (priceOptimData) => {
+      let priceOptimSellers = priceOptimData.sellers
+      console.log(priceOptimSellers + " 1")
+      let res = await itemQuerys.getPrices(priceOptimSellers)
 
       socket.emit('postPrices', res)
 
       socket.on('startScraper', async (data) => {
         if (Object.hasOwn(activeTasks, 'priceOptimTask')) {
-          socket.emit('displayScraperStatus', { scraper: 'priceOptimTask', msg: "Scraper Has Already Been Started", Title: "Scraper Failed", isError: true })
+          socket.emit('displayNotif', { scraper: 'priceOptimTask', msg: "Scraper Has Already Been Started", Title: "Scraper Failed", isError: true })
         } else {
           activeTasks['priceOptimTask'] = { taskID: null }
-          socket.emit('displayScraperStatus', { scraper: 'priceOptimTask', msg: "Scraper Has Successfully Started", Title: "Scraper Running", isError: false })
+          socket.emit('displayNotif', { scraper: 'priceOptimTask', msg: "Scraper Has Successfully Started", Title: "Scraper Running", isError: false })
           socket.to(KleinID).emit('updatePrices', data.scraperDatas)
         }
       });
 
       client.on('notification', async (msg) => {
-        res = await itemQuerys.getPrices(data.sellers)
+        console.log(priceOptimSellers + " 2")
+        let newRes = await itemQuerys.getPrices(priceOptimSellers)
 
-        socket.emit('postPrices', res)
+        socket.emit('postPrices', newRes)
       })
 
       client.query('LISTEN price_notif')
@@ -148,9 +152,9 @@ io.on("connection", (socket) => {
 
       socket.on('startScraperItems', async (scraperData) => {
         if (Object.hasOwn(activeTasks, scraperData.scraper)) {
-          socket.emit('displayScraperStatus', { scraper: scraperData.scraper, msg: scraperData.scraper + " Scraper Has Already Been Started", Title: "Scraper Failed", isError: true })
+          socket.emit('displayNotif', { scraper: scraperData.scraper, msg: scraperData.scraper + " Scraper Has Already Been Started", Title: "Scraper Failed", isError: true })
         } else {
-          socket.emit('displayScraperStatus', { scraper: scraperData.scraper, msg: scraperData.scraper + " Scraper Has Successfully Started", Title: "Scraper Running", isError: false })
+          socket.emit('displayNotif', { scraper: scraperData.scraper, msg: scraperData.scraper + " Scraper Has Successfully Started", Title: "Scraper Running", isError: false })
           activeTasks[scraperData.scraper] = { taskID: null }
           socket.to(KleinID).emit('startScraper', scraperData)
 

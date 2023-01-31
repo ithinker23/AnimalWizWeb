@@ -21,7 +21,7 @@ module.exports = {
 
     getscrapedcount: (seller) => {
         return new Promise((resolve, reject) => {
-            let query = "SELECT COUNT(*) FROM (SELECT distinct pid FROM " + seller + ") as temp"
+            let query = "SELECT COUNT(*) FROM (SELECT distinct pid FROM " + seller + ") as " + seller + "tempScrapedCount"
 
             client.query(query, (err, res) => {
                 if (err) reject(err)
@@ -35,7 +35,7 @@ module.exports = {
 
     getnonscrapedcount: (seller) => {
         return new Promise((resolve, reject) => {
-            let query = "SELECT COUNT(*) FROM (SELECT aw.pid FROM " + config.get('tables.storeDB') + " aw LEFT JOIN " + seller + " sel ON sel.pid = aw.pid WHERE sel.pid IS NULL and aw.title != '') as temp"
+            let query = "SELECT COUNT(*) FROM (SELECT aw.pid FROM " + config.get('tables.storeDB') + " aw LEFT JOIN " + seller + " sel ON sel.pid = aw.pid WHERE sel.pid IS NULL and aw.title != '') as " + seller + "tempNonScrapedCount"
 
             client.query(query, (err, res) => {
                 if (err) reject(err)
@@ -48,7 +48,7 @@ module.exports = {
 
     getmappedcount: (seller) => {
         return new Promise((resolve, reject) => {
-            let query = "SELECT COUNT(*) FROM (SELECT store_name FROM " + config.get('tables.matchesDB') + " WHERE store_name = '" + seller + "' AND id IS NOT NULL AND pid IS NOT NULL) as temp"
+            let query = "SELECT COUNT(*) FROM (SELECT store_name FROM " + config.get('tables.matchesDB') + " WHERE store_name = '" + seller + "' AND id IS NOT NULL AND pid IS NOT NULL) as " + seller + "tempMappedCount"
             client.query(query, (err, res) => {
                 if (err) reject(err)
                 resolve(res.rows[0].count)
@@ -106,7 +106,7 @@ module.exports = {
 
     getPrices: async (sellers) => {
         return new Promise((resolve, reject) => {
-            matchList = []
+            let matchList = []
 
             let query = "SELECT DISTINCT pid FROM " + config.get('tables.matchesDB')
 
@@ -118,18 +118,18 @@ module.exports = {
 
                     pid = pids.rows[PIDindex].pid
                     query = "SELECT title,image_src,cost_per_item,variant_price FROM " + config.get('tables.storeDB') + " WHERE pid = " + pid
-                    let res = await client.query(query)
-                    let info = res.rows[0]
+                    let animalWizRes = await client.query(query)
+                    let info = animalWizRes.rows[0]
                     let match = {}
                     match[config.get('tables.storeDB')] = { title: info.title, image_src: info.image_src, costPerItem: info.cost_per_item, variantPrice: info.variant_price }
 
                     for (let selIndex = 0; selIndex <= sellers.length - 1; selIndex++) {
-                        seller = sellers[selIndex]
-                        query = "SELECT price,date_stamp FROM " + config.get('tables.pricesDB') + " WHERE pid = " + pid + " AND store_name = '" + seller + "' LIMIT 3"
-                        let res = await client.query(query)
+                        let seller = sellers[selIndex]
+                        query = "SELECT price,date_stamp FROM " + config.get('tables.pricesDB') + " WHERE pid = " + pid + " AND store_name = '" + seller + "' ORDER BY price_id DESC LIMIT 3"
+                        let sellerRes = await client.query(query)
                         match[seller] = { seller: seller }
                         match[seller]['price'] = []
-                        match[seller]['price'] = res.rows
+                        match[seller]['price'] = sellerRes.rows
                         if (selIndex >= sellers.length - 1) {
                             matchList.push(match)
 

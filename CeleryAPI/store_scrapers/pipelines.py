@@ -54,7 +54,12 @@ class Pipeline:
                                 item['id'],
                                 item['price']
                     ))
-
+                else:
+                     self.cur.execute("""insert into """ + cfg['tables']['price_history'] + """(store_name, pid, id, price) VALUES ('""" + spider.table_name + """',%s,%s,%s)""", (                  
+                                item['pid'],
+                                item['id'],
+                                item['price']
+                    ))
             else:
                 self.cur.execute("select p_url from " +  spider.table_name + " where p_url = '" + item['url'] + "'")
                 url = self.cur.fetchone()
@@ -68,20 +73,20 @@ class Pipeline:
                         item['url'],
                         item["description"]))
 
-                    self.cur.execute("SELECT id FROM " + spider.table_name + " WHERE p_url = '"+item['url']+"'")
-                    id = self.cur.fetchone()
-                    self.cur.execute("""select price from """ + cfg['tables']['price_history'] + """ where pid = %s and id=%s and store_name='""" + spider.table_name + """' order by time_stamp """, (
-                    item['pid'],
-                    id
-                     ))
+                self.cur.execute("SELECT id FROM " + spider.table_name + " WHERE p_url = '"+item['url']+"'")
+                id = self.cur.fetchone()
+                self.cur.execute("""select price from """ + cfg['tables']['price_history'] + """ where pid = %s and id=%s and store_name='""" + spider.table_name + """' order by time_stamp """, (
+                item['pid'],
+                id
+                ))
 
-                    last_price = self.cur.fetchone()
-                    if(last_price != None):
-                        if(last_price[0] != item['price']):
-                            self.cur.execute("""insert into """ + cfg['tables']['price_history'] + """(store_name, pid, id, price) VALUES ('""" + spider.table_name + """',%s,%s,%s)""", (                  
-                                item['pid'],
-                                id,
-                                item['price']
+                last_price = self.cur.fetchone()
+                if(last_price != None):
+                    if(last_price[0] != item['price']):
+                        self.cur.execute("""insert into """ + cfg['tables']['price_history'] + """(store_name, pid, id, price) VALUES ('""" + spider.table_name + """',%s,%s,%s)""", (                  
+                        item['pid'],
+                        id,
+                        item['price']
                     ))
 
         except Exception as error:

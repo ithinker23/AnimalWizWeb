@@ -7,7 +7,8 @@ export default function NotificationPanel({ socket }) {
     const [notifs, setNotifs] = useState([])
 
     useEffect(() => {
-        socket.on('displayScraperStatus', data => {
+        socket.on('displayNotif', data => {
+            console.log(data)
             setNotifs(prevNotifs => {
                 return [{data:data, key:uuidv4()},...prevNotifs]
             })
