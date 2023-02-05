@@ -27,8 +27,6 @@ body {
 
 .sellerCol {
     width: 400px;
-    min-width: 400px;
-    max-width: 400px;
     padding-right: 10px;
     margin-left:20px;
 }
@@ -145,11 +143,6 @@ body {
 .clearButton:hover {
     background-color: rgb(245, 74, 74);
 }
-.updateMatchesButton{
-    margin-bottom: 20px;
-}
-
-
 
 ::-webkit-scrollbar-track {
     box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
@@ -174,6 +167,7 @@ body {
     height: 100vh;
     padding: 0 10px 10px 10px;
     border-right: 4px solid black;
+    overflow-y: auto;
 }
 
 .header {
@@ -223,7 +217,7 @@ body {
 }
 .PriceOptimizationWindow{
     margin:auto;
-    width:80%;
+    width:95%;
 }
 .matchRow{
     display: flex;
@@ -275,28 +269,31 @@ body {
 }
 
 .homeNotScrapedItems{
-    margin-top:100px;
+    margin-top:80px;
+    width:100%;
 }
 .homeInfo{
     display: flex;
     flex-direction: row;
-    height:600px;
+    width:100%;
 }
 .homeNotScrapedItem{
     margin: 10px 0 10px 0;
     text-transform: uppercase;
 }
 .homeNotScrapedItemColumn{
-    width:500px;
-    margin-left: 50px;
+    width:50%;
     background-color: rgb(39, 39, 39);
     padding:20px;
     margin-bottom: 50px;
     border-radius: 10px;
+    margin-right: 5%;
 }
 .homeNotScrapedItemSeller{
     display: flex;
     flex-direction: row;
+    margin: auto;
+    width:95%;
 }
 .homeNotScrapedItemsList{
     overflow-y:auto ;
@@ -305,22 +302,31 @@ body {
 .homeNotScrapedItemTitle{
     text-align: center;
     text-transform: uppercase;
-    margin-bottom: 20px;
+    margin: 20px 0;
     font-size: 20px;
 }
 .inputUrlToScrape{
     height:100px;
+    text-align: center;
+    margin: 10px 5px;
 }
+.inputUrlToScrape > button{
+margin: auto;
+}
+
 .homeNotScrapedItemDoughnut{
     height:500px;
-    width:500px;
-    margin-left:200px;
+    width:50%;
+    margin-left:5%;
     background-color: rgb(39, 39, 39);
     padding: 20px;
     border-radius:20px;
+    display: flex;
+    justify-content: center;
 }
+
 .inputUrlToScrape > textarea{
-    width:98%;
+    width: 80%;
     height:40%;
     resize: none;
 }
@@ -342,7 +348,7 @@ body {
 
 .updateMatchesButton{
     margin:20px auto;
-    width:400px;
+    width:40%;
 }
 .priceOptimPage{
     padding-top:80px;
@@ -364,7 +370,7 @@ body {
     margin:10px 0;
     border-radius: 10px;
     padding:10px;
-    animation: notifAnim ease 4s;
+    animation: notifAnim ease 6s;
     opacity: 0%;
 }
 
@@ -382,7 +388,7 @@ body {
     0%{
         opacity: 100%;
     }
-    50%{
+    80%{
         opacity: 100%;
     }
     100%{
@@ -399,4 +405,84 @@ body {
 .pidInput{
     width:150px;
     margin-bottom: 10px;
+}
+
+@media only screen and (max-width:800px){
+
+.homeNotScrapedItemSeller{
+   flex-direction: column-reverse;
+}
+.homeNotScrapedItemDoughnut{
+    width:90%;
+    margin:auto;
+    height: fit-content;
+}
+.homeNotScrapedItemColumn{
+   display:none;
+
+}
+}
+
+@media only screen and (max-width:650px){
+.flexContent{
+    display: block;
+}
+.itemPrev{
+    position:relative;
+    width:80%;
+    margin:auto;
+    border:none;
+    height:auto;
+}
+.itemPrevTitle{
+    margin:0;
+}
+.itemGrid{
+    margin:auto 25px;
+    display: block;
+}
+.sellerCol{
+    width:90%;
+    margin: 25px auto;
+}
+.item{
+    padding: 10px;
+}
+.headerLinkGroup{
+    display: block;
+    margin-top: 7px;
+}
+.headerLink{
+    padding:10px;
+}
+
+}
+
+@media only screen and (max-width:920px){
+    .match,.matchDateTime{
+        font-size: 14px;
+    }
+}
+@media only screen and (max-width:600px){
+    .matchRow{
+        display: block;
+    }
+    .match{
+        width: 100%;
+    }
+    .matchTitle{
+        font-size: 20px ;
+        margin: auto;
+        width: 80%;
+        text-align: center;
+    }
+    .itemPrevImg{
+        width: 50%;
+        height:200px;
+        margin: auto
+    }
+    .updateMatchesButton{
+        margin:20px auto;
+        width:90%;
+    }
 }

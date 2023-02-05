@@ -7,16 +7,16 @@ export default function NotScrapedItemsList({ socket, seller, startScraperHome, 
     const showPerPage = 10
     const [page, setPage] = useState(1)
     const [items, setItems] = useState([])
-    const [graphData, setGraphData] = useState({foundPids:0, nullPids:0, mappedPids:0})
+    const [graphData, setGraphData] = useState({ foundPids: 0, nullPids: 0, mappedPids: 0 })
 
     ChartJS.register(ArcElement, Tooltip, Legend);
 
     const data = {
-        labels: ['Not Scraped','Scraped','Mapped'],
+        labels: ['Not Scraped', 'Scraped', 'Mapped'],
         datasets: [
             {
                 label: 'Items',
-                data: [graphData['nullPids'],graphData['foundPids'], graphData['mappedPids']],
+                data: [graphData['nullPids'], graphData['foundPids'], graphData['mappedPids']],
                 backgroundColor: [
                     'rgba(255, 99, 132, 0.5)',
                     'rgba(54, 162, 235, 0.5)',
@@ -50,10 +50,17 @@ export default function NotScrapedItemsList({ socket, seller, startScraperHome, 
         })
     }, [socket])
 
-    return (
+    function showStartBtn() {
+        console.log("ENV:" + process.env.REACT_APP_ENVI)
+        if (process.env.REACT_APP_ENVI == "development") {
+            return <div className='button' onClick={() => { startScraperHome(seller) }}> START {seller} SCRAPER</div>
+        }
+    }
+    return (<>
+        <div className='homeNotScrapedItemTitle'>{seller} NOT SCRAPED ITEMS</div>
+
         <div className='homeNotScrapedItemSeller'>
             <div className='homeNotScrapedItemColumn'>
-                <div className='homeNotScrapedItemTitle'>{seller} NOT SCRAPED ITEMS</div>
                 <div className='homeNotScrapedItemsList'>
                     {
                         items.map((item, index) => {
@@ -67,13 +74,14 @@ export default function NotScrapedItemsList({ socket, seller, startScraperHome, 
                     <div className='navButton button' onClick={() => { setPage((page) => { if (page - 1 > 0) { return page - 1 } else { return page } }) }}>Back</div>
                     <div className='navPrev'>{page} / {Math.round((items.length) / showPerPage)}</div>
                     <div className='navButton button' onClick={() => { setPage((page) => { if (page <= (items.length) / showPerPage) { return page + 1 } else { return page } }) }}>Next</div>
-                </div>
-                <div className='button' onClick={() => { startScraperHome(seller) }}> START {seller} SCRAPER</div>
+                </div>{
+                    showStartBtn()
+                }
                 <div className='button' onClick={() => { stopScraperHome(seller) }}> STOP {seller} SCRAPER</div>
             </div>
             <div className='homeNotScrapedItemDoughnut'>
                 <Doughnut data={data} />
             </div>
         </div>
-    )
+        </>)
 }

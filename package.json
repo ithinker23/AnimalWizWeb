@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "concurrently \"npm --prefix ./back-end run startdev\" \"npm --prefix ./front-end run startdev\" \" cd ./CeleryAPI/ && python celery_server.py \""
+    "start": "concurrently \"npm --prefix ./back-end run startdev\" \"npm --prefix ./front-end run startdev\" \" cd ./CeleryAPI/ && python celery_server.py configdev.ini\""
   },
   "repository": {
     "type": "git",

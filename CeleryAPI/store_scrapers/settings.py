@@ -58,10 +58,10 @@ USER_AGENT_LIST = [
     "Mozilla/5.0 (Windows NT 6.2; Win64; x64; rv:16.0.1) Gecko/20121011 Firefox/16.0.1"
 ]
 
-PROXY_USER = ''
-PROXY_PASSWORD= ''
+PROXY_USER = 'dyvknckj-rotate'
+PROXY_PASSWORD= '423u9k8fzo9o'
 PROXY_ENDPOINT = 'p.webshare.io'
-PROXY_PORT = '9999'
+PROXY_PORT = '80'
 
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = False
@@ -71,14 +71,14 @@ from shutil import which
 SELENIUM_DRIVER_NAME = 'chrome'
 SELENIUM_DRIVER_EXECUTABLE_PATH = which("chromedriver.exe") 
 SELENIUM_DRIVER_ARGUMENTS=['headless','Mozilla/5.0 (Windows NT 6.2; Win64; x64; rv:16.0.1) Gecko/20121011 Firefox/16.0.1',
-#'--proxy-server=' + PROXY_ENDPOINT + ":" + PROXY_PORT
+'--proxy-server=' + PROXY_ENDPOINT + ":" + PROXY_PORT
 ] # '--headless' if using chrome instead of firefox
 
 DOWNLOADER_MIDDLEWARES = {
     'store_scrapers.middlewares.StoreScrapersHeaderMiddleware':801,
     'scrapy_selenium.SeleniumMiddleware': 800,
-    #'store_scrapers.smartproxy_auth.ProxyMiddleware': 100,
-    #'scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware': 110,
+    'store_scrapers.smartproxy_auth.ProxyMiddleware': 100,
+    'scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware': 110,
 }
 
 ITEM_PIPELINES = {

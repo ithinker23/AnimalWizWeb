@@ -125,11 +125,19 @@ module.exports = {
 
                     for (let selIndex = 0; selIndex <= sellers.length - 1; selIndex++) {
                         let seller = sellers[selIndex]
-                        query = "SELECT price,date_stamp FROM " + config.get('tables.pricesDB') + " WHERE pid = " + pid + " AND store_name = '" + seller + "' ORDER BY price_id DESC LIMIT 3"
-                        let sellerRes = await client.query(query)
-                        match[seller] = { seller: seller }
-                        match[seller]['price'] = []
-                        match[seller]['price'] = sellerRes.rows
+
+                        query = "SELECT id FROM " + config.get('tables.matchesDB') + " WHERE pid = " + pid + " AND store_name = '" + seller + "'"
+                        let idRows = await client.query(query)
+                        if (idRows.rows.length > 0) {
+                            query = "SELECT price,date_stamp FROM " + config.get('tables.pricesDB') + " WHERE pid = " + pid + " AND store_name = '" + seller + "' AND id = " + idRows.rows[0].id + " ORDER BY price_id DESC LIMIT 3"
+                            let sellerRes = await client.query(query)
+                            match[seller] = { seller: seller }
+                            match[seller]['price'] = []
+                            match[seller]['price'] = sellerRes.rows
+                        } else {
+                            match[seller] = { seller: seller }
+                            match[seller]['price'] = []
+                        }
                         if (selIndex >= sellers.length - 1) {
                             matchList.push(match)
 

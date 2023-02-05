@@ -3,24 +3,25 @@ from store_scrapers.spiders.chewy_scraper import ChewyScraperSpider
 from store_scrapers.spiders.petsmart_scraper import PetSmartScraperSpider
 from scrapy.crawler import CrawlerProcess
 from scrapy.utils.project import get_project_settings
-import os
 import logging
 from configparser import ConfigParser
-from twisted.internet import reactor
+import os
+import sys
+
+configFile = sys.argv[1]
+
+os.environ['config'] = configFile
+
+cfg = ConfigParser()
+cfg.read(os.environ['config'])
 
 logger = logging.getLogger(__name__)
-
-
-file = 'config.ini'
-cfg = ConfigParser()
-cfg.read('config.ini')
 
 class StartScrapers:
     def run_crawl(scraper,mode=1,url=None,pid=None):
         settings_file_path = 'store_scrapers.settings' # The path seen from root, ie. from main.py
         os.environ.setdefault('SCRAPY_SETTINGS_MODULE', settings_file_path)
         process = CrawlerProcess(get_project_settings())
-        print("running run crawl")
 
         if scraper == 'amazon':
             deferred = process.crawl(AmazonScraperSpider, mode=mode,url=url,pid=pid)

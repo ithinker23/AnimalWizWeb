@@ -4,4 +4,4 @@ RUN apk update && apk add gcc libffi-dev libpq-dev postgresql-dev python3-dev mu
 WORKDIR /app
 COPY . .
 RUN pip install -r requirements.txt
-CMD ["python","celery_server.py"]
+CMD ["python","celery_server.py", "configprod.ini"]

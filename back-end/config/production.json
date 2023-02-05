@@ -1,6 +1,6 @@
 {
 "database":{
-    "host":"192.168.1.72",
+    "host":"172.31.12.194",
     "port":5432,
     "user":"postgres",
     "password":"admin12345",

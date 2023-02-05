@@ -6,13 +6,17 @@
 
 # useful for handling different item types with a single interface
 from configparser import ConfigParser
-import os
 from itemadapter import ItemAdapter
 import psycopg2
+import os
+import sys
 
-file = 'config.ini'
+configFile = sys.argv[1]
+
+os.environ['config'] = configFile
+
 cfg = ConfigParser()
-cfg.read('config.ini')
+cfg.read(os.environ['config'])
 
 class Pipeline:
 
@@ -88,7 +92,12 @@ class Pipeline:
                         id,
                         item['price']
                     ))
-
+                else:
+                     self.cur.execute("""insert into """ + cfg['tables']['price_history'] + """(store_name, pid, id, price) VALUES ('""" + spider.table_name + """',%s,%s,%s)""", (                  
+                                item['pid'],
+                                id,
+                                item['price']
+                    ))
         except Exception as error:
             raise error
     

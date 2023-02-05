@@ -33,15 +33,12 @@ io.on("connection", (socket) => {
     })
 
     socket.on('updScraperStatus', data => {
-      console.log(activeTasks)
       for (let taskIndex = 0; taskIndex <= Object.keys(activeTasks).length - 1; taskIndex++) {
         if (activeTasks[Object.keys(activeTasks)[taskIndex]]['taskID'] == data['task_id']) {
           delete activeTasks[Object.keys(activeTasks)[taskIndex]]
-          console.log('deleting task')
-          socket.broadcast.emit('displayNotif', { scraper: 'idk', msg: "Scraper Has Successfully Finished", Title: "Scraper Finished", isError: false })
+          socket.broadcast.emit('displayNotif', { scraper: 'idk', msg: data.returnVal, Title: "Scraper Finished", isError: data.isError })
         }
       }
-      console.log(activeTasks)
     })
   })
 
@@ -67,19 +64,23 @@ io.on("connection", (socket) => {
     });
 
     socket.on('stopScraper', data => {
-      let id = activeTasks[data.scraper].taskID
-      if (id != null) {
-        socket.to(KleinID).emit('stopScraper', id)
-        socket.emit('displayNotif', { scraper: data.scraper, msg: data.scraper + " Scraper Has Been Stopped", Title: "Scraper Stopped", isError: false })
+      if (activeTasks[data.scraper] != null) {
+        let id = activeTasks[data.scraper].taskID
+        if (id != null) {
+          socket.to(KleinID).emit('stopScraper', id)
+          socket.emit('displayNotif', { scraper: data.scraper, msg: data.scraper + " Scraper Has Been Stopped", Title: "Scraper Stopped", isError: false })
 
+        } else {
+          socket.emit('displayNotif', { scraper: data.scraper, msg: data.scraper + " Scraper Is Not Running", Title: "Scraper Stop Failed", isError: true })
+        }
       } else {
         socket.emit('displayNotif', { scraper: data.scraper, msg: data.scraper + " Scraper Is Not Running", Title: "Scraper Stop Failed", isError: true })
-
       }
     })
 
-    socket.on('getHomeData', () => {
+    socket.on('getHomeData', async () => {
       console.log("home connected")
+
       socket.on('startScraper', async (scraperData) => {
         if (Object.hasOwn(activeTasks, scraperData.scraper)) {
           socket.emit('displayNotif', { scraper: scraperData.scraper, msg: scraperData.scraper + " Scraper Has Already Been Started", Title: "Scraper Failed", isError: true })
@@ -94,7 +95,7 @@ io.on("connection", (socket) => {
 
         let graphData = {}
 
-        seller = msg.payload
+        let seller = msg.payload
 
         let scraped = await itemQuerys.getscrapedcount(seller)
         graphData['foundPids'] = scraped

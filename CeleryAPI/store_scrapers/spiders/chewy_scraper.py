@@ -1,4 +1,3 @@
-import os
 from configparser import ConfigParser
 import scrapy
 from scrapy_selenium import SeleniumRequest
@@ -7,11 +6,16 @@ from store_scrapers.items import ScrapedItem;
 from html.parser import HTMLParser
 import psycopg2
 import re
+from scrapy.exceptions import CloseSpider
+import os
+import sys
 
+configFile = sys.argv[1]
 
-file = 'config.ini'
+os.environ['config'] = configFile
+
 cfg = ConfigParser()
-cfg.read('config.ini')
+cfg.read(os.environ['config'])
 
 class ChewyScraperSpider(scrapy.Spider):
     name = 'chewy_scraper'
@@ -39,7 +43,7 @@ class ChewyScraperSpider(scrapy.Spider):
                 cur.execute("SELECT pid,p_url FROM chewy WHERE id = " + str(id[0]))
                 for res in cur.fetchall():
                     sel_script="document.querySelectorAll('.a-spacing-small.item.imageThumbnail.a-declarative').forEach((element)=>{element.click()});"
-                    yield SeleniumRequest(url = res[1], callback=self.parse_product, cb_kwargs={"pid":res[0], "id":id[0]}, script=sel_script)
+                    yield SeleniumRequest(url = res[1], callback=self.parse_product,errback=self.closeSpider, cb_kwargs={"pid":res[0], "id":id[0]}, script=sel_script)
                     # yield SeleniumRequest(url = "https://portchecker.co/", callback=self.parse_product, cb_kwargs={"pid":res[0], "id":id[0]})
         elif(self.updateMode == 2):
             #SCRAPE NEW ITEMS FROM DATABASE
@@ -47,10 +51,10 @@ class ChewyScraperSpider(scrapy.Spider):
 
             query_results = cur.fetchall()
             for result in query_results:
-                yield scrapy.Request(url=self.base_url + self.search_url + self.sanitizeQuery(result[1]), callback=self.parse, cb_kwargs={"pid":result[0], "id":None, 'pages':int(cfg['chewy']['s_pages'])})
+                yield scrapy.Request(url=self.base_url + self.search_url + self.sanitizeQuery(result[1]), callback=self.parse,errback=self.closeSpider, cb_kwargs={"pid":result[0], "id":None, 'pages':int(cfg['chewy']['s_pages'])})
         else:
             #SCRAPE MANUAL ENTRY
-            yield scrapy.Request(url=self.url, callback=self.parse_product, cb_kwargs={"pid":self.pid, "id":None, 'pages':int(cfg['chewy']['s_pages'])})
+            yield scrapy.Request(url=self.url, callback=self.parse_product,errback=self.closeSpider, cb_kwargs={"pid":self.pid, "id":None, 'pages':int(cfg['chewy']['s_pages'])})
  
     def parse(self, response, pid, id, pages):
         pagesToScan = pages
@@ -63,6 +67,7 @@ class ChewyScraperSpider(scrapy.Spider):
                     yield SeleniumRequest(
                                         url=link, 
                                         callback=self.parse_product,
+                                        errback=self.closeSpider,
                                         cb_kwargs={"pid": pid, "id": id},
                                         script=sel_script
                     )
@@ -73,7 +78,7 @@ class ChewyScraperSpider(scrapy.Spider):
             pagesToScan -= 1
             next_page = response.xpath(cfg['chewy']['s_nextpagexpath']).get() if response.xpath(cfg['chewy']['s_nextpagexpath']).get() != None  else []
             if(next_page != []):
-                yield response.follow(next_page, callback=self.parse,cb_kwargs={"pid": pid, "pages":pagesToScan, 'id':id} )
+                yield response.follow(next_page, callback=self.parse,errback=self.closeSpider,cb_kwargs={"pid": pid, "pages":pagesToScan, 'id':id} )
     
     def parse_product(self, response, pid, id):
         if(response.xpath(cfg['chewy']['p_titlexpath']).get() == None):
@@ -106,6 +111,10 @@ class ChewyScraperSpider(scrapy.Spider):
     def sanitizeQuery(self,query):
         return re.sub('[^A-Za-z0-9 ]+', '', query)
 
+
+    def closeSpider(self,failure):
+        raise CloseSpider(failure)
+    
 class HTMLTagsRemover(HTMLParser):
     def __init__(self):
         super().__init__(convert_charrefs=False)

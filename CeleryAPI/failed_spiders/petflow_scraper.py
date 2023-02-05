@@ -20,7 +20,8 @@ logger.setLevel(logging.ERROR)
 
 
 
-file = 'store_scrapers/config.ini'
+file = 'store_scrapers/' + os.environ['config']
+
 cfg = ConfigParser()
 cfg.read(file)
 
