@@ -13,4 +13,6 @@ router.route('/getPidList')
 router.route('/checkMappingState')
 .post(controller.checkMappingState)
 
+router.route('/getMatchesCSV')
+.post(controller.getMatchesCSV)
 module.exports = router; 

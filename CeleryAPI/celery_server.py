@@ -92,6 +92,5 @@ if __name__ == "__main__":
 
     argv = [
             'worker',
-            '-P', 'threads',
-            '--loglevel=DEBUG',]
+            '-P', 'threads',]
     celeryApp.worker_main(argv)

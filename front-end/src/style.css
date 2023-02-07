@@ -22,9 +22,13 @@ body {
     overflow-y: hidden;
     margin-top:100px;
 }
+.pricesItemLink{
+    color:white;
+}
 
-
-
+.downloadCSV{
+    margin-top:20px;
+}
 .sellerCol {
     width: 400px;
     padding-right: 10px;
@@ -342,7 +346,7 @@ margin: auto;
 .matchDateTime{
     font-size: 13px;
 }
-.match > .matchDateTime:not(:first-child){
+.match > .matchDateTime:not(:nth-child(2)){
     color:red
 }
 
@@ -483,6 +487,6 @@ margin: auto;
     }
     .updateMatchesButton{
         margin:20px auto;
-        width:90%;
+        width:70%;
     }
 }

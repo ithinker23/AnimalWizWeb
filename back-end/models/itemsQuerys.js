@@ -1,11 +1,20 @@
 const client = require('./dbConnection');
 const config = require('config');
-const e = require('cors');
 
 module.exports = {
+    getMatchesCSV: async (store)=>{
+        let query = "SELECT store_name, pid, id FROM " + config.get('tables.matchesDB')
+
+        let res = await client.query(query)
+
+        for(let row = 0; row < res.rows.length; row++){
+            
+        }
+
+    },
 
     getItems: (table, pid, sortBy) => {
-        var query = "SELECT * FROM " + table + " WHERE pid = " + pid
+        let query = "SELECT * FROM " + table + " WHERE pid = " + pid
 
         if (sortBy != null) {
             query += " ORDER BY " + sortBy
@@ -93,7 +102,7 @@ module.exports = {
     },
 
     getPidList: (table) => {
-        var query = "SELECT pid FROM " + table + " WHERE title != ''"
+        let query = "SELECT pid FROM " + table + " WHERE title != ''"
 
         return new Promise((resolve, reject) => {
             client.query(query, (err, res) => {
@@ -131,12 +140,17 @@ module.exports = {
                         if (idRows.rows.length > 0) {
                             query = "SELECT price,date_stamp FROM " + config.get('tables.pricesDB') + " WHERE pid = " + pid + " AND store_name = '" + seller + "' AND id = " + idRows.rows[0].id + " ORDER BY price_id DESC LIMIT 3"
                             let sellerRes = await client.query(query)
+                            query = "SELECT p_url FROM " + seller + " WHERE pid = " + pid + " AND id = " + idRows.rows[0].id
+                            let urlRes = await client.query(query)
+
                             match[seller] = { seller: seller }
                             match[seller]['price'] = []
                             match[seller]['price'] = sellerRes.rows
+                            match[seller]['url'] = urlRes.rows[0].p_url
                         } else {
                             match[seller] = { seller: seller }
                             match[seller]['price'] = []
+                            match[seller]['url'] = null
                         }
                         if (selIndex >= sellers.length - 1) {
                             matchList.push(match)

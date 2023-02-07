@@ -23,6 +23,14 @@ module.exports = {
             res.sendStatus(400)
         }
 
-    }
+    },
+    getMatchesCSV: async (req,res) => {
+        try {
+            let result = await itemsQuerys.getMatchesCSV(req.body.store)
+            res.send(result)
+        } catch (err) {
+            res.sendStatus(400)
+        }
+    },
 
 }
