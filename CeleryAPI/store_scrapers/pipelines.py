@@ -52,6 +52,8 @@ class Pipeline:
 
                 last_price = self.cur.fetchone()
                 if(last_price != None):
+                    print("last Price: " + last_price[0] + " current price: " + item['price'])
+                    print(last_price[0] != item['price'])
                     if(last_price[0] != item['price']):
                         self.cur.execute("""insert into """ + cfg['tables']['price_history'] + """(store_name, pid, id, price) VALUES ('""" + spider.table_name + """',%s,%s,%s)""", (                  
                                 item['pid'],

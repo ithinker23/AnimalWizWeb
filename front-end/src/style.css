@@ -467,7 +467,7 @@ margin: auto;
         font-size: 14px;
     }
 }
-@media only screen and (max-width:600px){
+@media only screen and (max-width:930px){
     .matchRow{
         display: block;
     }
@@ -481,7 +481,7 @@ margin: auto;
         text-align: center;
     }
     .itemPrevImg{
-        width: 50%;
+        width: 30%;
         height:200px;
         margin: auto
     }

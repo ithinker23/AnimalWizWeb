@@ -17,8 +17,10 @@
     "faker": "^6.6.6",
     "react": "^18.2.0",
     "react-chartjs-2": "^5.2.0",
+    "react-csv": "^2.2.2",
     "react-dom": "^18.2.0",
     "react-icons": "^4.7.1",
+    "react-json-to-csv": "^1.2.0",
     "react-router-dom": "^6.4.3",
     "react-scripts": "5.0.1",
     "react-uuid": "^2.0.0",
@@ -27,7 +29,7 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "startdev": "env-cmd -f dev.env react-scripts start",
+    "startdev": "set PORT=3000 && env-cmd -f dev.env react-scripts start",
     "startprod": "env-cmd -f .env react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",

@@ -15,4 +15,7 @@ router.route('/checkMappingState')
 
 router.route('/getMatchesCSV')
 .post(controller.getMatchesCSV)
+
+router.route('/submitPrice')
+.post(controller.submitPrice)
 module.exports = router; 

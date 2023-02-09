@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import PriceRow from '../components/priceOptimComponents/PriceRow'
 import {AiOutlineDownload} from 'react-icons/ai'
+import CsvDownloadButton from 'react-json-to-csv'
 
 export default function PriceOptimization({ sellers, storeDB, socket, expressAPI }) {
 
@@ -10,7 +11,6 @@ export default function PriceOptimization({ sellers, storeDB, socket, expressAPI
         socket.emit('getPriceOptimData', { sellers: sellers })
 
         socket.on('postPrices', (data) => {
-            console.log(data)
             setPrices(data)
         })
     }, [socket])
@@ -18,19 +18,20 @@ export default function PriceOptimization({ sellers, storeDB, socket, expressAPI
     function scrapePrices() {
         socket.emit('startScraper', { scraperDatas: sellers.map(seller => { return { scraper: seller, mode: 1 } }) })
     }
-    function downloadCSV() {
-        expressAPI.post('/items/getMatchesCSV', {store:storeDB})
-    }
 
+    function submitPrice(price, pid){
+        expressAPI.post('/items/submitPrice', {price:price, pid:pid})
+
+    }
     return (<>
         <div className="priceOptimPage">
             <div style={{"display":"flex"}}>
                 <div className="button updateMatchesButton" onClick={scrapePrices}> UPDATE PRICES </div>
-                <div className="button downloadCSV" onClick={downloadCSV}> <AiOutlineDownload/> CSV </div>
+                <div className="button downloadCSV"><CsvDownloadButton data={prices.map((priceRow) => {return priceRow['animal_wiz']})} delimiter=","/></div>
             </div>
             <div className="PriceOptimizationWindow">
                 {prices.map((price, index) => {
-                    return <PriceRow price={price} sellers={sellers} storeDB={storeDB} index={index} />
+                    return <PriceRow price={price} sellers={sellers} storeDB={storeDB} index={index} submitPrice={submitPrice}/>
                 })}
             </div>
         </div>

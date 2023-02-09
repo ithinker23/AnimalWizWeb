@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/ithinker23/AnimalWizWeb#readme",
   "dependencies": {
-    "concurrently": "^7.6.0"
+    "concurrently": "^7.6.0",
+    "react-json-to-csv": "^1.2.0"
   }
 }
