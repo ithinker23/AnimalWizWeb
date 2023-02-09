@@ -1,6 +1,5 @@
 const client = require('./dbConnection');
 const config = require('config');
-const Parser = require('json2csv').Parser;
 
 module.exports = {
     submitPrice: (price, pid) => {
@@ -193,26 +192,4 @@ module.exports = {
             })
         })
     },
-    getMatchesCSV: () => {
-        return new Promise((resolve, reject) => {
-            let fields = [{
-                label: 'First Name',
-                value: 'first_name'
-            },
-            {
-                label: 'Last Name',
-                value: 'last_name'
-            },
-            {
-                label: 'Email Address',
-                value: 'email_address'
-            }]
-
-            let data = { first_name: 'ishan', last_name: 'rana', email_address: 'ishansrana320@fafd.com' }
-            const json2csv = new Parser({ fields });
-            const csv = json2csv.parse(data);
-            resolve(csv);
-        })
-    },
-
 }
