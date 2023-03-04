@@ -8,7 +8,7 @@ export default function PriceOptimization({ sellers, storeDB, socket, expressAPI
     const [prices, setPrices] = useState([])
 
     useEffect(() => {
-        socket.emit('getPriceOptimData', { sellers: sellers })
+        socket.emit('getPriceOptimData', { sellers: sellers,  token:localStorage.getItem('loginJWTToken')})
 
         socket.on('postPrices', (data) => {
             setPrices(data)
@@ -16,7 +16,7 @@ export default function PriceOptimization({ sellers, storeDB, socket, expressAPI
     }, [socket])
 
     function scrapePrices() {
-        socket.emit('startScraper', { scraperDatas: sellers.map(seller => { return { scraper: seller, mode: 1 } }) })
+        socket.emit('startScraper', { scraperDatas: sellers.map(seller => { return { scraper: seller, mode: 1 } }) ,  token:localStorage.getItem('loginJWTToken')})
     }
 
     function submitPrice(price, pid){

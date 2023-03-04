@@ -45,7 +45,7 @@ class Pipeline:
 
         try:
             if(item['id'] != None):
-                self.cur.execute("""select price from """ + cfg['tables']['price_history'] + """ where pid = %s and id=%s and store_name='""" + spider.table_name + """' order by time_stamp """, (
+                self.cur.execute("""select price from """ + cfg['tables']['price_history'] + """ where pid = %s and id=%s and store_name='""" + spider.table_name + """' ORDER BY date_stamp DESC""", (
                     item['pid'],
                     item['id']
                 ))
@@ -55,6 +55,7 @@ class Pipeline:
                     print("last Price: " + last_price[0] + " current price: " + item['price'])
                     print(last_price[0] != item['price'])
                     if(last_price[0] != item['price']):
+                        print(item)
                         self.cur.execute("""insert into """ + cfg['tables']['price_history'] + """(store_name, pid, id, price) VALUES ('""" + spider.table_name + """',%s,%s,%s)""", (                  
                                 item['pid'],
                                 item['id'],

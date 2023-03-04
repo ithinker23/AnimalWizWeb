@@ -39,7 +39,7 @@ export default function NotScrapedItemsList({ socket, seller, startScraperHome, 
     };
 
     useEffect(() => {
-        socket.emit('getSellerHomeData', seller)
+        socket.emit('getSellerHomeData', {seller: seller,  token:localStorage.getItem('loginJWTToken') })
 
         socket.on('updateSellerHomeInfo', (data) => {
             console.log(data)

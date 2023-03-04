@@ -18,4 +18,5 @@ router.route('/getMatchesCSV')
 
 router.route('/submitPrice')
 .post(controller.submitPrice)
+
 module.exports = router; 

@@ -1,10 +1,7 @@
 const { Server } = require('socket.io')
 const http = require('http')
-const itemQuerys = require('./models/itemsQuerys')
-const userQuerys = require('./models/userQuerys')
-const client = require('./models/dbConnection')
 const app = require('./app')
-
+const userQuerys = require('./models/userQuerys')
 const server = http.createServer(app)
 
 const io = new Server(server, {
@@ -18,193 +15,56 @@ server.listen(5001, () => {
   console.log('socketio listening on port 5001')
 })
 
-let KleinID
+let celeryID
+
+const setCeleryID = (value) => {
+  celeryID = value
+}
+
+const getCeleryID = () => {
+  return celeryID
+}
 
 let activeTasks = {}
 
-io.on("connection", (socket) => {
+const celeryHandler = require('./event_handlers/celeryHandler')
+const homeHandler = require('./event_handlers/homeHandler')
+const itemSelectionHandler = require('./event_handlers/itemSelectionHandler')
+const POHandler = require('./event_handlers/POHandler')
+const userHandler = require('./event_handlers/userHandler')
 
-  socket.on('signUp',async (data)=> {
-    let successful = await userQuerys.signUp(data.Username, data.Password, data.sellers)
-    if(successful){
-      socket.emit('displayNotif', { msg: "Sign Up Is Successful", Title: "Signed Up!", isError: !successful })
-    }else{
-      socket.emit('displayNotif', { msg: "Store Is Already Signed Up", Title: "Sign Up Failed", isError: !successful })
-    }
-  })
-  socket.on('login',async (data)=> {
-    let res = await userQuerys.login(data.Username, data.Password)
-    if(res.successful){
-      socket.emit('loginRes', res)
-      socket.emit('displayNotif', { msg: "Login Is Successful", Title: "Logging In!", isError: !res.successful })
-    }else{
-      socket.emit('displayNotif', { msg: "Store Doesnt Exist Or Password Is Incorrect", Title: "Login Failed", isError: !res.successful })
-    }
-  })
+let authEvents = ['stopScraper', 'getSellerHomeData', 'getHomeData', 'startScraper', 'getItemsData', 'startScraperItems', 'mapItem', 'clearMapped', 'getPriceOptimData']
 
-  socket.on('registercelery', () => {
-    KleinID = socket.id
-    console.log("celery connected")
+const onConnection = (socket) => {
 
-    socket.on('celeryScraperID', data => {
-      activeTasks[data.scraper] = { taskID: data.id }
-      console.log(activeTasks)
-    })
-
-    socket.on('updScraperStatus', data => {
-      for (let taskIndex = 0; taskIndex <= Object.keys(activeTasks).length - 1; taskIndex++) {
-        if (activeTasks[Object.keys(activeTasks)[taskIndex]]['taskID'] == data['task_id']) {
-          delete activeTasks[Object.keys(activeTasks)[taskIndex]]
-          socket.broadcast.emit('displayNotif', { scraper: 'idk', msg: data.returnVal, Title: "Scraper Finished", isError: data.isError })
+  socket.use(async (packet, next) => {
+    for (let i = 0; i < authEvents.length; i++) {
+      let eventName = authEvents[i]
+      if (eventName == packet[0]) {
+        if (await userQuerys.checkForUser(packet[1].token)) {
+          next()
+        } else {
+          socket.emit('displayNotif', { msg: "User Is Invalid", Title: "Login Failure", isError: true })
+          break
         }
       }
-    })
-  })
-
-  socket.on('registeruser', () => {
-    console.log("user connected")
-
-    socket.on('getSellerHomeData', async (seller) => {
-      let graphData = {}
-
-      let scraped = await itemQuerys.getscrapedcount(seller)
-      graphData['foundPids'] = scraped
-
-      let nonscraped = await itemQuerys.getnonscrapedcount(seller)
-      graphData['nullPids'] = nonscraped
-
-      let mapped = await itemQuerys.getmappedcount(seller)
-      graphData['mappedPids'] = mapped
-
-      let nullItems = await itemQuerys.getNullItems(seller)
-
-      socket.emit('updateSellerHomeInfo', { graphData: graphData, itemData: nullItems, seller: seller })
-
-    });
-
-    socket.on('stopScraper', data => {
-      if (activeTasks[data.scraper] != null) {
-        let id = activeTasks[data.scraper].taskID
-        if (id != null) {
-          socket.to(KleinID).emit('stopScraper', id)
-          socket.emit('displayNotif', { scraper: data.scraper, msg: data.scraper + " Scraper Has Been Stopped", Title: "Scraper Stopped", isError: false })
-
-        } else {
-          socket.emit('displayNotif', { scraper: data.scraper, msg: data.scraper + " Scraper Is Not Running", Title: "Scraper Stop Failed", isError: true })
-        }
-      } else {
-        socket.emit('displayNotif', { scraper: data.scraper, msg: data.scraper + " Scraper Is Not Running", Title: "Scraper Stop Failed", isError: true })
+      if (i == authEvents.length - 1) {
+        next()
       }
-    })
-
-    socket.on('getHomeData', async () => {
-      console.log("home connected")
-
-      socket.on('startScraper', async (scraperData) => {
-        if (Object.hasOwn(activeTasks, scraperData.scraper)) {
-          socket.emit('displayNotif', { scraper: scraperData.scraper, msg: scraperData.scraper + " Scraper Has Already Been Started", Title: "Scraper Failed", isError: true })
-        } else {
-          socket.emit('displayNotif', { scraper: scraperData.scraper, msg: scraperData.scraper + " Scraper Has Successfully Started", Title: "Scraper Running", isError: false })
-          activeTasks[scraperData.scraper] = { taskID: null }
-          socket.to(KleinID).emit('startScraper', scraperData)
-        }
-      })
-
-      client.on('notification', async function (msg) {
-
-        let graphData = {}
-
-        let seller = msg.payload
-
-        let scraped = await itemQuerys.getscrapedcount(seller)
-        graphData['foundPids'] = scraped
-
-        let nonscraped = await itemQuerys.getnonscrapedcount(seller)
-        graphData['nullPids'] = nonscraped
-
-        let mapped = await itemQuerys.getmappedcount(seller)
-        graphData['mappedPids'] = mapped
-
-        let nullItems = await itemQuerys.getNullItems(seller)
-
-        socket.emit('updateSellerHomeInfo', { graphData: graphData, itemData: nullItems, seller: seller })
-      })
-
-      client.query('LISTEN items_notif')
-
-      socket.on('disconnect', () => {
-        client.query('UNLISTEN items_notif')
-      })
-    })
-
-    socket.on('getPriceOptimData', async (priceOptimData) => {
-      let priceOptimSellers = priceOptimData.sellers
-      console.log(priceOptimSellers + " 1")
-      let res = await itemQuerys.getPrices(priceOptimSellers)
-
-      socket.emit('postPrices', res)
-
-      socket.on('startScraper', async (data) => {
-        if (Object.hasOwn(activeTasks, 'priceOptimTask')) {
-          socket.emit('displayNotif', { scraper: 'priceOptimTask', msg: "Scraper Has Already Been Started", Title: "Scraper Failed", isError: true })
-        } else {
-          activeTasks['priceOptimTask'] = { taskID: null }
-          socket.emit('displayNotif', { scraper: 'priceOptimTask', msg: "Scraper Has Successfully Started", Title: "Scraper Running", isError: false })
-          socket.to(KleinID).emit('updatePrices', data.scraperDatas)
-        }
-      });
-
-      client.on('notification', async (msg) => {
-        console.log(priceOptimSellers + " 2")
-        let newRes = await itemQuerys.getPrices(priceOptimSellers)
-
-        socket.emit('postPrices', newRes)
-      })
-
-      client.query('LISTEN price_notif')
-
-      socket.on('disconnect', () => {
-        client.query('UNLISTEN price_notif')
-      })
-    })
-
-    socket.on('getItemsData', () => {
-
-      socket.on('startScraperItems', async (scraperData) => {
-        if (Object.hasOwn(activeTasks, scraperData.scraper)) {
-          socket.emit('displayNotif', { scraper: scraperData.scraper, msg: scraperData.scraper + " Scraper Has Already Been Started", Title: "Scraper Failed", isError: true })
-        } else {
-          socket.emit('displayNotif', { scraper: scraperData.scraper, msg: scraperData.scraper + " Scraper Has Successfully Started", Title: "Scraper Running", isError: false })
-          activeTasks[scraperData.scraper] = { taskID: null }
-          socket.to(KleinID).emit('startScraper', scraperData)
-
-          client.on('notification', async function (msg) {
-            let res = await itemQuerys.getItems(scraperData.scraper, scraperData.pid, "similarity")
-            socket.emit('scraperItems', { data: res.rows, seller: scraperData.scraper })
-          })
-        }
-      })
-
-      socket.on('mapItem', async (data) => {
-        let res = await itemQuerys.updateMappings(data['pid'], data['id'], data['seller'])
-        socket.emit('postMappedItem', res)
-      })
-
-      socket.on('clearMapped', async (data) => {
-        await itemQuerys.clearMappings(data['pid'], data['seller'], data['id'])
-        socket.emit('postMappedItem', { id: "-1", seller: data['seller'], pid: data['pid'] })
-      })
-
-      client.query('LISTEN items_notif')
-
-      socket.on('disconnect', () => {
-        client.query('UNLISTEN items_notif')
-      })
-    })
+    }
   })
+
+  celeryHandler(io, socket, setCeleryID)
+  userHandler(io, socket)
+  homeHandler(io, socket, getCeleryID)
+  itemSelectionHandler(io, socket, getCeleryID)
+  POHandler(io, socket, getCeleryID)
+
   socket.on('disconnect', () => {
     console.log('user disconnected')
   })
-})
+}
 
-module.exports = io
+io.on("connection", onConnection)
+
+module.exports = { io, celeryID, activeTasks }

@@ -10,11 +10,14 @@ app.use(cors({origin: '*', credentials: true}));
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 
-const itemsRoute = require('./routes/itemsRoute.js');
-app.use('/items', itemsRoute);
-
 const _404Route = require('./routes/404Route');
 app.use('/', _404Route)
+
+const auth = require('./middlewares/userAuth.js')
+app.use(auth.authExpress)
+
+const itemsRoute = require('./routes/itemsRoute.js');
+app.use('/items', itemsRoute)
 
 const urlsRoute = require('./routes/urlsRoute');
 app.use('/urls', urlsRoute)

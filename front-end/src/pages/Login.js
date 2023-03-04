@@ -17,7 +17,7 @@ export default function Login({expressAPI, socket, setSellers}) {
                     localStorage.setItem('loginJWTToken', data.jwtToken)
                     setTimeout(()=>{
                         window.location.href = "/"
-                    }, 500)
+                    }, 1000)
                 }
             })
         }

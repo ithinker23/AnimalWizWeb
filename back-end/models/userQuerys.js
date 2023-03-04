@@ -11,7 +11,7 @@ module.exports = {
             query = "INSERT INTO " + config.get('tables.users') + "(store_name, password, sellers) VALUES ('" + username + "','" + password + "','{" + sellers + "}')"
             await client.query(query)
             return true
-        }else{
+        } else {
             return false
         }
     },
@@ -20,9 +20,24 @@ module.exports = {
         let query = "SELECT user_id,sellers FROM " + config.get('tables.users') + " WHERE store_name = '" + username + "' AND password = '" + password + "'"
         let existingUser = await client.query(query)
         if (existingUser.rows.length > 0) {
-            return {successful:true, jwtToken: jwt.sign({username:username}, config.get('auth.token'), { expiresIn: '24h' })}
-        }else{
-            return {successful:true}
+            return { successful: true, jwtToken: jwt.sign({ username: username }, config.get('auth.token'), { expiresIn: '24h' }) }
+        } else {
+            return { successful: false }
+        }
+    },
+
+    checkForUser: async (token) => {
+        const decode = jwt.decode(token)
+        if (decode) {
+            let query = "SELECT user_id FROM " + config.get('tables.users') + " WHERE store_name = '" + decode.username + "'"
+            let res = await client.query(query)
+            if (res.rows.length > 0) {
+                return true
+            } else {
+                return false
+            }
+        } else {
+            return false
         }
     }
 }
