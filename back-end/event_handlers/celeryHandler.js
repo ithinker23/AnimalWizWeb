@@ -1,6 +1,7 @@
 
 
-module.exports = (io, socket, setCeleryID) => {
+module.exports = (io, socket, setCeleryID, activeTasks) => {
+
     socket.on('registercelery', () => {
         setCeleryID(socket.id)
         console.log("celery connected")

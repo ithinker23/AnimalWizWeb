@@ -33,22 +33,23 @@ class CallbackTask(Task):
 @celeryApp.task(name='start_scrapy_process', base=CallbackTask)
 def start_scrapy_process(data):
     try:
-        p = Process(target=StartScrapers.run_crawl, kwargs=data)
+        p = Process(target=StartScrapers.run_crawl, kwargs={'scraper':data.get('scraper'), 'mode':data.get('mode'), 'url':data.get('url',None), 'pid':data.get('pid',None)})
         p.start()
         p.join()
         return "Scraper Has Finished Running"
     except SoftTimeLimitExceeded:
         raise SoftTimeLimitExceeded
 
-@celeryApp.task(name='test', base=CallbackTask)
-def test(data):
-    print("running test")
-    time.sleep(100)
-    return "done test"
+# @celeryApp.task(name='test', base=CallbackTask)
+# def test(data):
+#     print("running test")
+#     time.sleep(100)
+#     return "done test"
 
 
 @celeryApp.task(name='start_multi_scrapy_process',base=CallbackTask)
 def start_multi_scrapy_process(data):
+    print(data)
     try:
         p = Process(target=StartScrapers.run_multi_crawl, kwargs={'scraperDatas':data})
         p.start()
@@ -68,6 +69,7 @@ def handle_scrapers(data):
 
 @sio.on('updatePrices')
 def update_prices(data):
+    print(data)
     task = start_multi_scrapy_process.apply_async(kwargs={'data':data})
     sio.emit('celeryScraperID', {'scraper':'priceOptimTask', 'id':task.id})
 

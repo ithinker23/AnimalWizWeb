@@ -10,7 +10,7 @@ export default function Login({expressAPI, socket, setSellers}) {
         if (!(usernameRef.current.value === "" || passwordRef.current.value === "")) {
             const formData = { Username: usernameRef.current.value, Password: passwordRef.current.value }
 
-            socket.emit('login', formData)
+            socket.emit('users:login', formData)
 
             socket.on('loginRes', data => {
                 if(data.successful){

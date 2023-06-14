@@ -23,10 +23,10 @@ export default function SellerCol({ expressAPI, selectItem, seller, data, pid, s
         setMappedItem(res.data.id)
     }
     function clearMapped() {
-        socket.emit('clearMapped', { seller: seller, pid: pid, id: mappedItem, token:localStorage.getItem('loginJWTToken') })
+        socket.emit('items:clearMapped', { seller: seller, pid: pid, id: mappedItem, token:localStorage.getItem('loginJWTToken') })
     }
     async function scrapeUrl() {
-        socket.emit('startScraperItems', { pid: pid, scraper: seller, url: urlTextRef.current.value, mode: 3,  token:localStorage.getItem('loginJWTToken') })
+        socket.emit('items:startScraper', { pid: pid, scraper: seller, url: urlTextRef.current.value, mode: 3,  token:localStorage.getItem('loginJWTToken') })
     }
     function addTick() {
         if (mappedItem == "-1") {

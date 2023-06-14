@@ -21,7 +21,6 @@ cfg.read(os.environ['config'])
 class Pipeline:
 
     def __init__(self):
-
         ## Create/Connect to database
         self.connection = psycopg2.connect(host=cfg["db_connection"]["hostname"], user=cfg['db_connection']['username'], password=cfg['db_connection']['password'], dbname=cfg['db_connection']['database'])
         ## Create cursor, used to execute commands

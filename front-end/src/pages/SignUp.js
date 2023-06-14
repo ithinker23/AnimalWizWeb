@@ -12,7 +12,7 @@ export default function SignUp({ socket }) {
         if (!(usernameRef.current.value === "" || passwordRef.current.value === "")) {
             const formData = { Username: usernameRef.current.value, Password: passwordRef.current.value, sellers:checked }
 
-            socket.emit('signUp', formData)
+            socket.emit('users:signUp', formData)
         }
     }
     const handleCheck = (event) => {

@@ -4,11 +4,11 @@ import SellerHomeInfo from '../components/homeComponents/SellerHomeInfo'
 export default function Home({ sellers, socket }) {
 
   function startScraperHome(seller){
-    socket.emit('startScraper', {scraper:seller, mode:2, token:localStorage.getItem('loginJWTToken')})
+    socket.emit('home:startScraper', {scraper:seller, mode:2, token:localStorage.getItem('loginJWTToken')})
   }
 
   function stopScraperHome(seller){
-    socket.emit('stopScraper', {scraper:seller, token:localStorage.getItem('loginJWTToken')})
+    socket.emit('home:stopScraper', {scraper:seller, token:localStorage.getItem('loginJWTToken')})
   }
   
   useEffect(()=>{

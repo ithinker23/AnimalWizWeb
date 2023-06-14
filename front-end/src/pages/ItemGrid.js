@@ -13,7 +13,7 @@ export default function ItemGrid({expressAPI, sellers, storeDB, socket}) {
     const [prevData, setPrevData] = useState({pid:null, images:[], title:"", description:"", price:""})
    
     useEffect(() => {
-        socket.emit('getItemsData', {token:localStorage.getItem('loginJWTToken')})
+        socket.emit('items:getData', {token:localStorage.getItem('loginJWTToken')})
         socket.on('scraperItems',(reqdata)=>{
             setData((prevData)=>{
                 let newData = {...prevData}
@@ -25,7 +25,7 @@ export default function ItemGrid({expressAPI, sellers, storeDB, socket}) {
     }, [socket])
 
     function selectItem(pid, id, seller){
-        socket.emit('mapItem', {pid:pid, id:id, seller:seller, token:localStorage.getItem('loginJWTToken')})
+        socket.emit('items:mapItem', {pid:pid, id:id, seller:seller, token:localStorage.getItem('loginJWTToken')})
     }
 
     return (<>

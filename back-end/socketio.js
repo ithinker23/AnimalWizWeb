@@ -33,32 +33,32 @@ const itemSelectionHandler = require('./event_handlers/itemSelectionHandler')
 const POHandler = require('./event_handlers/POHandler')
 const userHandler = require('./event_handlers/userHandler')
 
-let authEvents = ['stopScraper', 'getSellerHomeData', 'getHomeData', 'startScraper', 'getItemsData', 'startScraperItems', 'mapItem', 'clearMapped', 'getPriceOptimData']
+let authEvents = ['home:stopScraper', 'home:getData', 'home:getData', 'home:startScraper', 'items:getData', 'items:startScraper', 'items:mapItem', 'items:clearMapped', 'PO:getData','PO:startScraper']
 
 const onConnection = (socket) => {
 
   socket.use(async (packet, next) => {
-    for (let i = 0; i < authEvents.length; i++) {
-      let eventName = authEvents[i]
-      if (eventName == packet[0]) {
-        if (await userQuerys.checkForUser(packet[1].token)) {
+    console.log(packet)
+      for (let i = 0; i < authEvents.length; i++) {
+        if (authEvents[i] == packet[0]) {
+          if (await userQuerys.checkForUser(packet[1].token)) {
+            next()
+          } else {
+            socket.emit('displayNotif', { msg: "User Is Invalid", Title: "Login Failure", isError: true })
+            break
+          }
+        }
+        if (i == authEvents.length - 1) {
           next()
-        } else {
-          socket.emit('displayNotif', { msg: "User Is Invalid", Title: "Login Failure", isError: true })
-          break
         }
       }
-      if (i == authEvents.length - 1) {
-        next()
-      }
-    }
   })
 
-  celeryHandler(io, socket, setCeleryID)
+  celeryHandler(io, socket, setCeleryID, activeTasks)
   userHandler(io, socket)
-  homeHandler(io, socket, getCeleryID)
-  itemSelectionHandler(io, socket, getCeleryID)
-  POHandler(io, socket, getCeleryID)
+  homeHandler(io, socket, getCeleryID, activeTasks)
+  itemSelectionHandler(io, socket, getCeleryID, activeTasks)
+  POHandler(io, socket, getCeleryID, activeTasks)
 
   socket.on('disconnect', () => {
     console.log('user disconnected')
@@ -67,4 +67,4 @@ const onConnection = (socket) => {
 
 io.on("connection", onConnection)
 
-module.exports = { io, celeryID, activeTasks }
+module.exports = { io }

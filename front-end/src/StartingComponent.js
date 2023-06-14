@@ -36,7 +36,7 @@ export default function StartingComponent() {
           <Route path="/findItems" element={<ItemGrid expressAPI={expressAPI} socket={socket} sellers={sellers} storeDB={storeDB} />} />
           <Route path="/priceOptimization" element={<PriceOptimization expressAPI={expressAPI} socket={socket} sellers={sellers} storeDB={storeDB} />} />
           <Route path="/login" element={<Login expressAPI={expressAPI} socket={socket}/>} />
-          <Route path="/signUp" element={<SignUp expressAPI={expressAPI} socket={socket} />} />
+          {/* <Route path="/signUp" element={<SignUp expressAPI={expressAPI} socket={socket} />} /> */}
           <Route path="/logOut" element={<LogOut/>} />
 
         </Routes>

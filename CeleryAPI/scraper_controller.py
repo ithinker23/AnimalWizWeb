@@ -39,7 +39,6 @@ class StartScrapers:
         os.environ.setdefault('SCRAPY_SETTINGS_MODULE', settings_file_path)
         process = CrawlerProcess(get_project_settings())
         for scraperData in scraperDatas:
-            print(scraperData)
             if scraperData.get('scraper') == 'amazon':
                 deferred = process.crawl(AmazonScraperSpider, mode=scraperData.get('mode',1),url=scraperData.get('url',None),pid=scraperData.get('pid',None))
             elif scraperData.get('scraper') == 'chewy':
@@ -51,4 +50,4 @@ class StartScrapers:
 
         return deferred
 
-#StartScrapers.run_multi_crawl([{'scraper':'amazon','mode':1}])
+# StartScrapers.run_multi_crawl([{'scraper':'amazon','mode':1}])
